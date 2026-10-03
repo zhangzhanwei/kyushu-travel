@@ -1321,8 +1321,6 @@ body{font-size:16.5px}
 </div>
 </div>
 
-</section>
-
 <!-- ═══ D3 TAB ═══ -->
 <div class="tab-panel" id="panel-d3">
 <div class="day-header" style="background:linear-gradient(135deg,var(--d3),#3D6B20)">
@@ -1851,6 +1849,9 @@ if(el._leaflet_map)el._leaflet_map.invalidateSize();
 (function(){
 if(typeof L==='undefined'){console.warn('Leaflet not loaded');return}
 
+// 让每个地图实例挂到容器上，供 Tab切换/滚动时的 invalidateSize 修复使用
+L.Map.addInitHook(function(){try{this._container._leaflet_map=this}catch(e){}});
+
 // 主源 CartoDB（日本地图细节最佳），备源 OSM（国内可访问、日本全覆盖）；高德瓦片不覆盖日本已弃用
 var tileSources=[
 {url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',opts:{subdomains:'abcd',attribution:'&copy; CARTO',maxZoom:18}},
@@ -1877,7 +1878,7 @@ html:'<div class="marker-pin" style="background:'+color+'">'+text+'</div>',
 iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]});
 }
 function addMarkers(m,pts){
-pts.forEach(function(p){var emoji=p.n.split(' ')[0];L.marker(p.p,{icon:makeIcon(emoji,p.c)}).addTo(m).bindPopup('<strong>'+p.n+'</strong>')});
+pts.forEach(function(p){var emoji=p.n.split(' ')[0];var glink='https://www.google.com/maps/search/?api=1&query='+p.p[0]+','+p.p[1];L.marker(p.p,{icon:makeIcon(emoji,p.c)}).addTo(m).bindPopup('<strong>'+p.n+'</strong><br><a href="'+glink+'" target="_blank" rel="noopener" style="color:var(--ocean);font-size:12px">📍 在Google地图中导航</a>')});
 }
 
 // Overview map
@@ -1911,13 +1912,13 @@ L.polyline([[33.590,130.410],[33.585,130.447],[33.567,130.447]],{color:'#7A7A7A'
 (function(){
 var m1=L.map('hotel-map-1',{scrollWheelZoom:false}).setView([32.792,130.741],15);
 addTileLayer(m1);
-L.marker([32.792,130.741],{icon:makeIcon('🏨','#1B3A5C')}).addTo(m1).bindPopup('<strong>The Blossom 熊本</strong>');
+L.marker([32.792,130.741],{icon:makeIcon('🏨','#1B3A5C')}).addTo(m1).bindPopup('<strong>The Blossom 熊本</strong><br><a href="https://www.google.com/maps/search/?api=1&query=32.792,130.741" target="_blank" rel="noopener" style="color:var(--ocean);font-size:12px">📍 在Google地图中导航</a>');
 var m2=L.map('hotel-map-2',{scrollWheelZoom:false}).setView([33.280,131.496],15);
 addTileLayer(m2);
-L.marker([33.280,131.496],{icon:makeIcon('♨️','#2D2D2D')}).addTo(m2).bindPopup('<strong>AMANEK BEPPU YULA-RE</strong>');
+L.marker([33.280,131.496],{icon:makeIcon('♨️','#2D2D2D')}).addTo(m2).bindPopup('<strong>AMANEK BEPPU YULA-RE</strong><br><a href="https://www.google.com/maps/search/?api=1&query=33.280,131.496" target="_blank" rel="noopener" style="color:var(--ocean);font-size:12px">📍 在Google地图中导航</a>');
 var m3=L.map('hotel-map-3',{scrollWheelZoom:false}).setView([33.590,130.410],15);
 addTileLayer(m3);
-L.marker([33.590,130.410],{icon:makeIcon('🏮','#5B3A6B')}).addTo(m3).bindPopup('<strong>THE Royal Park Canvas 福冈中洲</strong>');
+L.marker([33.590,130.410],{icon:makeIcon('🏮','#5B3A6B')}).addTo(m3).bindPopup('<strong>THE Royal Park Canvas 福冈中洲</strong><br><a href="https://www.google.com/maps/search/?api=1&query=33.590,130.410" target="_blank" rel="noopener" style="color:var(--ocean);font-size:12px">📍 在Google地图中导航</a>');
 })();
 
 // D1 map
