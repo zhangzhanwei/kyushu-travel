@@ -768,6 +768,15 @@ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vie
 
 /* MAPS */
 .map-container{border-radius:8px;overflow:hidden;box-shadow:var(--card-shadow);margin:24px 0;border:1px solid rgba(184,134,11,0.12)}
+/* MAP TOGGLE 折叠 */
+.map-container .map-toggle,.hotel-card .map-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:13px 16px;margin:0;background:var(--paper);border:none;border-left:4px solid var(--mc,var(--ocean));font-family:var(--font-serif);font-size:14.5px;font-weight:600;color:var(--indigo);cursor:pointer;text-align:left;transition:color .2s}
+.map-container .map-toggle:hover,.hotel-card .map-toggle:hover{color:var(--volcano)}
+.mt-hint{font-size:12px;font-weight:400;color:var(--ink-muted);font-family:var(--font-sans);white-space:nowrap}
+.map-body{display:none}
+.open>.map-body{display:block}
+.open>.map-toggle{color:var(--volcano)}
+.hotel-card .map-toggle{margin:14px 14px 0;border-radius:6px 6px 0 0;border:1px solid rgba(184,134,11,0.1);border-left:4px solid var(--mc,var(--indigo))}
+.hotel-card .map-body .hotel-map{margin-top:0}
 .map-container .map{height:400px;width:100%}
 .map-container.day-map .map{height:350px}
 .map-legend{display:flex;flex-wrap:wrap;gap:12px;padding:12px 16px;background:var(--paper);font-size:12px;border-top:1px solid rgba(184,134,11,0.08)}
@@ -1030,10 +1039,13 @@ body{font-size:16.5px}
 <div class="section-title">
 <div class="jp-sub">に · こうつうちず</div>
 <h2><span class="num">贰</span>城际交通总览</h2>
-<p>六天路线全景地图（可缩放拖动）</p>
+<p>路线地图默认收起，点击展开查看 · 地图标记可一键Google导航</p>
 </div>
 <div class="map-container" id="map-overview-box">
+<button class="map-toggle" data-target="map-overview" style="--mc:var(--volcano)">🗺️ 六天路线全景图<span class="mt-hint">点击展开</span></button>
+<div class="map-body">
 <div class="map" id="map-overview"></div>
+</div>
 <div class="map-legend">
 <span><span class="dot" style="background:var(--d1)"></span>D1 福冈→熊本</span>
 <span><span class="dot" style="background:var(--d2)"></span>D2 熊本↔天草</span>
@@ -1068,7 +1080,7 @@ body{font-size:16.5px}
 <span class="hotel-tag">🛍️ 上通商店街</span>
 <span class="hotel-tag">📍 熊本核心</span>
 </div>
-<div class="hotel-map" id="hotel-map-1"></div>
+<button class="map-toggle" data-target="hotel-map-1" style="--mc:#1B3A5C">🏨 The Blossom 熊本 · 位置图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="hotel-map" id="hotel-map-1"></div></div>
 </div>
 <div class="hotel-card">
 <div class="hotel-header" style="background:linear-gradient(135deg,#2D2D2D,#4A4A4A)">
@@ -1081,7 +1093,7 @@ body{font-size:16.5px}
 <span class="hotel-tag">🏆 Good Design Award</span>
 <span class="hotel-tag">🚉 站前3min</span>
 </div>
-<div class="hotel-map" id="hotel-map-2"></div>
+<button class="map-toggle" data-target="hotel-map-2" style="--mc:#2D2D2D">♨️ AMANEK 别府 · 位置图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="hotel-map" id="hotel-map-2"></div></div>
 </div>
 <div class="hotel-card">
 <div class="hotel-header" style="background:linear-gradient(135deg,#5B3A6B,#7B5EA7)">
@@ -1094,7 +1106,7 @@ body{font-size:16.5px}
 <span class="hotel-tag">🏮 中洲屋台</span>
 <span class="hotel-tag">🛍️ 运河城步行圈</span>
 </div>
-<div class="hotel-map" id="hotel-map-3"></div>
+<button class="map-toggle" data-target="hotel-map-3" style="--mc:#5B3A6B">🏮 Royal Park Canvas 中洲 · 位置图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="hotel-map" id="hotel-map-3"></div></div>
 </div>
 </div>
 </div>
@@ -1109,12 +1121,13 @@ body{font-size:16.5px}
 <p>点击可勾选，状态自动保存</p>
 </div>
 <div class="checklist" id="checklist">
-<div class="checklist-item" data-key="t2"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🐬 天草海豚观赏</div><div class="cl-desc">提前1-2周 · KKday路线巴士一日游约10,600日元/人</div></div></div>
-<div class="checklist-item" data-key="aso"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🌋 阿苏包车</div><div class="cl-desc">提前1-2周 · 7人座，熊本→别府，10h / 约2,300元</div></div></div>
-<div class="checklist-item" data-key="zoo"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🐘 九州动物园丛林巴士</div><div class="cl-desc">每月15日预约次月平日下午场 · 官网预约</div></div></div>
-<div class="checklist-item" data-key="kidzania"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🏙️ KidZania福冈</div><div class="cl-desc">提前网上预约 · 9:00-15:00的6小时票</div></div></div>
-<div class="checklist-item" data-key="anpanman"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🍞 面包超人博物馆</div><div class="cl-desc">可网上或当日购买 · 2,000-2,200日元/人(1岁+)</div></div></div>
-<div class="checklist-item" data-key="bus"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🚌 福冈机场→熊本巴士</div><div class="cl-desc">当日乘车无需预约 · ひのくに号 2,500日元/人</div></div></div>
+<div class="checklist-item" data-key="t2"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🐬 天草海豚观赏</div><div class="cl-desc">KKday/KLOOK 搜「天草海豚一日游」· 提前3~5天订 · 约10,600日元/人（含往返巴士+2h游船+BBQ午餐）</div></div></div>
+<div class="checklist-item" data-key="aso"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🌋 阿苏包车</div><div class="cl-desc">KKday/KLOOK 搜「熊本 阿苏 包车」· 最晚提前7天 · 7座全天10h约2,300元（含油费司机餐，超时5,000日元/h）</div></div></div>
+<div class="checklist-item" data-key="zoo"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🐘 九州动物园丛林巴士</div><div class="cl-desc">官网 africansafari.co.jp · 每月15日10:00放次月票（9/15抢10/7下午场15:10）· 没抢到可当日9:30开园现场补票</div></div></div>
+<div class="checklist-item" data-key="kidzania"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🏙️ KidZania福冈</div><div class="cl-desc">官网 kidzania.jp/fukuoka 预约9:00场6小时票 · 儿童4,800/大人2,500日元 · 热门日期提前1周+</div></div></div>
+<div class="checklist-item" data-key="anpanman"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🍞 面包超人博物馆</div><div class="cl-desc">平日可现场购票 · 周末建议提前网上/便利店购买 · 2,000~2,200日元（1岁+）</div></div></div>
+<div class="checklist-item" data-key="esim"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">📶 eSIM/通讯</div><div class="cl-desc">出发前1~2天开通（Ubigi/Airalo/华为天际通均可）· 或租随身WiFi · 顺带下载Google地图离线包</div></div></div>
+<div class="checklist-item" data-key="bus"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🚌 福冈机场→熊本巴士</div><div class="cl-desc">无需预约 · 国内线航站楼2F乘车 · 每30~60min一班 · 2,500日元（现金/IC卡）</div></div></div>
 </div>
 </div>
 </section>
@@ -1145,7 +1158,7 @@ body{font-size:16.5px}
 <div class="day-meta"><span>🏨 The Blossom 熊本</span><span>✈️+🚌 约2h</span><span>强度 ★★☆</span></div>
 </div>
 
-<div class="map-container day-map"><div class="map" id="map-d1"></div></div>
+<div class="map-container day-map"><button class="map-toggle" data-target="map-d1" style="--mc:var(--d1)">🗺️ D1 上海→熊本 · 路线图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="map" id="map-d1"></div></div></div>
 
 <h3 class="day-subtitle">🚩 交通攻略</h3>
 <div class="transport-steps">
@@ -1186,11 +1199,14 @@ body{font-size:16.5px}
 
 <h3 class="day-subtitle">📋 时间轴</h3>
 <div class="timeline">
-<div class="tl-item"><div class="tl-time">落地后</div><div class="tl-text">入境取行李，乘免费接驳到国内线航站楼，在2F乘「ひのくに号」高速巴士<br><small>站台有明显标识「熊本行き」</small></div></div>
-<div class="tl-item"><div class="tl-time">约2h后</div><div class="tl-text">抵达熊本樱町BT，打车前往The Blossom酒店<br><small>办理入住，稍事休整</small></div></div>
-<div class="tl-item"><div class="tl-time">16:00 - 18:00</div><div class="tl-text">🏯 熊本城外观散步<br><small>天守阁黑色外观壮美，傍晚拍照最佳。城墙石垣在夕阳下格外震撼</small></div></div>
-<div class="tl-item"><div class="tl-time">18:00 - 20:00</div><div class="tl-text">🍜 晚餐：熊本拉面 / 马刺し<br><small>推荐上通商店街附近觅食，「桂花ラーメン」或「黒亭」都是名店</small></div></div>
-<div class="tl-item"><div class="tl-time">20:00</div><div class="tl-text">回酒店休息，为明天天草之行养精蓄锐</div></div>
+<div class="tl-item"><div class="tl-time">07:30</div><div class="tl-text">抵达上海浦东T1（国际线提前2h+）<br><small>东航MU517，值机托运过海关</small></div></div>
+<div class="tl-item"><div class="tl-time">09:50 - 12:55</div><div class="tl-text">✈️ MU517 上海浦东T1 → 福冈<br><small>约2h飞行，机上填好入境记录</small></div></div>
+<div class="tl-item"><div class="tl-time">12:55 - 14:00</div><div class="tl-text">入境 → 取行李 → 海关<br><small>约1h，之后免费接驳巴士5min到国内线航站楼</small></div></div>
+<div class="tl-item"><div class="tl-time">14:00 - 14:30</div><div class="tl-text">国内线航站楼2F乘「ひのくに号」<br><small>每30~60min一班无需预约，站台有「熊本行き」标识</small></div></div>
+<div class="tl-item"><div class="tl-time">约16:30</div><div class="tl-text">抵达熊本樱町BT，打车5min至The Blossom办理入住<br><small>约16:45进房，稍事休整</small></div></div>
+<div class="tl-item"><div class="tl-time">17:15 - 18:15</div><div class="tl-text">🏯 熊本城外观散步<br><small>黄昏+灯光时段拍照最佳，城墙石垣在夕阳下格外震撼</small></div></div>
+<div class="tl-item"><div class="tl-time">18:30 - 20:00</div><div class="tl-text">🍜 晚餐：熊本拉面 / 马刺し<br><small>上通商店街附近，「桂花ラーメン」或「黒亭」都是名店</small></div></div>
+<div class="tl-item"><div class="tl-time">20:30</div><div class="tl-text">回酒店休息，为明天天草之行养精蓄锐</div></div>
 </div>
 
 <h3 class="day-subtitle">📍 地标详解</h3>
@@ -1223,6 +1239,12 @@ body{font-size:16.5px}
 <div class="food-card"><div class="food-emoji">🌿</div><h4>辛子蓮根</h4><p>莲藕孔中填入芥末味噌后裹面衣油炸，细川藩时代的料理传承</p><span class="food-price">约500日元</span></div>
 </div>
 
+<div class="tips-box" style="border-left-color:var(--ocean);background:linear-gradient(135deg,rgba(46,92,138,0.05),rgba(46,92,138,0.02))"><h4 style="color:var(--ocean)">🌧️ 雨天 Plan B</h4><ul>
+<li>今天是交通日+市区活动，下雨影响最小</li>
+<li>上通/下通商店街都有拱廊，雨天逛街完全不受影响</li>
+<li>暴雨改熊本城外观为「樱之马场 城彩苑」（室内企业文化区，有餐厅与特产）</li>
+<li>大雨若致高速封路，巴士班次会延迟，当天别排太满</li>
+</ul></div>
 <div class="tips-box">
 <h4>📝 Day 1 小贴士</h4>
 <ul>
@@ -1242,7 +1264,7 @@ body{font-size:16.5px}
 <div class="day-meta"><span>🏨 The Blossom 熊本</span><span>🚌 往返约3.5h</span><span>强度 ★★★</span></div>
 </div>
 
-<div class="map-container day-map"><div class="map" id="map-d2"></div></div>
+<div class="map-container day-map"><button class="map-toggle" data-target="map-d2" style="--mc:var(--d2)">🗺️ D2 天草海豚 · 路线图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="map" id="map-d2"></div></div></div>
 
 <h3 class="day-subtitle">🚩 交通攻略</h3>
 <div class="transport-steps">
@@ -1309,6 +1331,12 @@ body{font-size:16.5px}
 </div>
 </div>
 
+<div class="tips-box" style="border-left-color:var(--ocean);background:linear-gradient(135deg,rgba(46,92,138,0.05),rgba(46,92,138,0.02))"><h4 style="color:var(--ocean)">🌧️ 雨天 Plan B</h4><ul>
+<li>海豚游船小雨照常出海（船有室内舱位），基本不受影响</li>
+<li>海景BBQ遇雨移至室内场地</li>
+<li>风浪大停航时 → KKday全额退款；备选：熊本市内（县立美术馆/城彩苑/鹤屋百货）</li>
+<li>海上风大，船上备一件薄外套，穿防滑鞋</li>
+</ul></div>
 <div class="tips-box">
 <h4>📝 Day 2 小贴士</h4>
 <ul>
@@ -1328,7 +1356,7 @@ body{font-size:16.5px}
 <div class="day-meta"><span>🏨 AMANEK BEPPU YULA-RE</span><span>🚐 包车10h</span><span>强度 ★★★☆</span></div>
 </div>
 
-<div class="map-container day-map"><div class="map" id="map-d3"></div></div>
+<div class="map-container day-map"><button class="map-toggle" data-target="map-d3" style="--mc:var(--d3)">🗺️ D3 阿苏火山→别府 · 路线图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="map" id="map-d3"></div></div></div>
 
 <h3 class="day-subtitle">🚩 交通攻略</h3>
 <div class="transport-steps">
@@ -1405,6 +1433,12 @@ body{font-size:16.5px}
 <div class="food-card"><div class="food-emoji">🍲</div><h4>面疙瘩汤（だご汁）</h4><p>九州乡土料理，手捏面疙瘩配蔬菜味噌汤，暖身佳品。阿苏10月已凉，喝一碗很舒服</p><span class="food-price">约800日元</span></div>
 </div>
 
+<div class="tips-box" style="border-left-color:var(--ocean);background:linear-gradient(135deg,rgba(46,92,138,0.05),rgba(46,92,138,0.02))"><h4 style="color:var(--ocean)">🌧️ 雨天 Plan B</h4><ul>
+<li>雨雾天大观峰/火山口大概率白茫茫一片 → 前一晚查 asovolcano.com 实时摄像头，再和司机商量调整顺序</li>
+<li>火山口因天气关闭 → 阿苏火山博物馆（实时影像）+ 内牧温泉足汤 + 道之驿买特产</li>
+<li>包车的优势就是灵活：雨天可先去别府方向，午后折返看情况</li>
+<li>雨天正好早点到AMANEK，顶楼温泉泳池+大浴场泡个够</li>
+</ul></div>
 <div class="tips-box">
 <h4>📝 Day 3 小贴士</h4>
 <ul>
@@ -1425,7 +1459,7 @@ body{font-size:16.5px}
 <div class="day-meta"><span>🏨 Royal Park Canvas福冈中洲</span><span>🚌+🚃 约2h</span><span>强度 ★★★</span></div>
 </div>
 
-<div class="map-container day-map"><div class="map" id="map-d4"></div></div>
+<div class="map-container day-map"><button class="map-toggle" data-target="map-d4" style="--mc:var(--d4)">🗺️ D4 动物园→福冈 · 路线图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="map" id="map-d4"></div></div></div>
 
 <h3 class="day-subtitle">🚩 交通攻略</h3>
 <div class="transport-steps">
@@ -1482,6 +1516,9 @@ body{font-size:16.5px}
 <div class="tl-item"><div class="tl-time">09:15</div><div class="tl-text">抵达九州自然动物园</div></div>
 <div class="tl-item"><div class="tl-time">09:30 - 12:00</div><div class="tl-text">🐘 Fureai Zone（互动区）<br><small>9种动物亲密接触 + 尝试购买丛林巴士票</small></div></div>
 <div class="tl-item"><div class="tl-time">12:00 - 13:00</div><div class="tl-text">园内午餐</div></div>
+<div class="tl-item"><div class="tl-time">13:00 - 14:00</div><div class="tl-text">🦒 Fureai Zone 自由互动<br><small>喂长颈鹿、豚鼠屋、小动物触摸；顺手确认当日表演时刻表</small></div></div>
+<div class="tl-item"><div class="tl-time">14:00 - 14:50</div><div class="tl-text">草原区步行道散步 + 午后动物表演（以当日时刻表为准）<br><small>孩子在旁边游乐区放电，大人咖啡休整</small></div></div>
+<div class="tl-item"><div class="tl-time">14:50 - 15:10</div><div class="tl-text">🚌 丛林巴士乘车处提前排队<br><small>对准预约的15:10场次，提前候车从容入场</small></div></div>
 <div class="tl-item"><div class="tl-time">15:10 - 16:00</div><div class="tl-text">🚌 丛林巴士 Safari Zone！<br><small>铁笼车穿越猛兽区，近距离看狮子老虎</small></div></div>
 <div class="tl-item"><div class="tl-time">16:00 - 16:40</div><div class="tl-text">巴士返回别府站</div></div>
 <div class="tl-item"><div class="tl-time">17:00</div><div class="tl-text">🚃 JR特急音速号前往博多<br><small>约2h车程，车上休息</small></div></div>
@@ -1517,6 +1554,12 @@ body{font-size:16.5px}
 <div class="food-card"><div class="food-emoji">🥩</div><h4>丰后和牛烧肉</h4><p>大分县品牌牛，肉质细腻，入口即化。推荐在别府站前烧肉店享用</p><span class="food-price">约3,000日元+</span></div>
 </div>
 
+<div class="tips-box" style="border-left-color:var(--ocean);background:linear-gradient(135deg,rgba(46,92,138,0.05),rgba(46,92,138,0.02))"><h4 style="color:var(--ocean)">🌧️ 雨天 Plan B</h4><ul>
+<li>小雨动物园照常玩（丛林巴士有顶棚，Fureai区照开）</li>
+<li>大雨丛林巴士可能停运 → 改「别府地狱巡游」：海地狱/血池地狱有室内参观+温泉足汤</li>
+<li>或加别府市区：竹瓦温泉（复古澡堂）+ Storia Hall购物中心</li>
+<li>JR特急一般不受降雨影响（台风除外），赶不上就坐下一班</li>
+</ul></div>
 <div class="tips-box">
 <h4>📝 Day 4 小贴士</h4>
 <ul>
@@ -1537,7 +1580,7 @@ body{font-size:16.5px}
 <div class="day-meta"><span>🏨 Royal Park Canvas福冈中洲</span><span>🚃+🚌 约1h</span><span>强度 ★★☆</span></div>
 </div>
 
-<div class="map-container day-map"><div class="map" id="map-d5"></div></div>
+<div class="map-container day-map"><button class="map-toggle" data-target="map-d5" style="--mc:var(--d5)">🗺️ D5 海之中道 · 路线图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="map" id="map-d5"></div></div></div>
 
 <h3 class="day-subtitle">🚩 交通攻略</h3>
 <div class="transport-steps">
@@ -1606,6 +1649,11 @@ body{font-size:16.5px}
 <div class="food-card"><div class="food-emoji">🐟</div><h4>明太子</h4><p>辣味鳕鱼子，福冈特产。推荐在博多站购买伴手礼</p><span class="food-price">各种价位</span></div>
 </div>
 
+<div class="tips-box" style="border-left-color:var(--ocean);background:linear-gradient(135deg,rgba(46,92,138,0.05),rgba(46,92,138,0.02))"><h4 style="color:var(--ocean)">🌧️ 雨天 Plan B</h4><ul>
+<li>顺序对调：上午先去面包超人博物馆（全室内），下午视天气决定公园或商场</li>
+<li>海之中道雨天的备选：园区内「海洋世界海之中道水族馆」全室内，有海豚表演</li>
+<li>博多运河城、川端商店街都有顶棚/拱廊，雨天照样逛</li>
+</ul></div>
 <div class="tips-box">
 <h4>📝 Day 5 小贴士</h4>
 <ul>
@@ -1626,7 +1674,7 @@ body{font-size:16.5px}
 <div class="day-meta"><span>🚃+✈️</span><span>强度 ★★☆</span></div>
 </div>
 
-<div class="map-container day-map"><div class="map" id="map-d6"></div></div>
+<div class="map-container day-map"><button class="map-toggle" data-target="map-d6" style="--mc:var(--d6)">🗺️ D6 KidZania→机场 · 路线图<span class="mt-hint">点击展开</span></button><div class="map-body"><div class="map" id="map-d6"></div></div></div>
 
 <h3 class="day-subtitle">🚩 交通攻略</h3>
 <div class="transport-steps">
@@ -1653,13 +1701,13 @@ body{font-size:16.5px}
 
 <h3 class="day-subtitle">📋 时间轴</h3>
 <div class="timeline">
-<div class="tl-item"><div class="tl-time">08:00</div><div class="tl-text">退房，行李寄存前台</div></div>
-<div class="tl-item"><div class="tl-time">08:30</div><div class="tl-text">出发前往LaLaport福冈</div></div>
-<div class="tl-item"><div class="tl-time">08:50</div><div class="tl-text">到达LaLaport福冈 / KidZania</div></div>
-<div class="tl-item"><div class="tl-time">09:00 - 15:00</div><div class="tl-text">🏙️ KidZania福冈！<br><small>约70种职业体验：消防员、飞行员、寿司师傅…<br>九州限定：高汤专门店、汉方研究所</small></div></div>
-<div class="tl-item"><div class="tl-time">15:00</div><div class="tl-text">取行李，出发去机场</div></div>
-<div class="tl-item"><div class="tl-time">16:00</div><div class="tl-text">到达福冈机场，办理值机</div></div>
-<div class="tl-item"><div class="tl-time">航班起飞</div><div class="tl-text">✈️ 福冈 → 上海，再见九州！🌋</div></div>
+<div class="tl-item"><div class="tl-time">08:00</div><div class="tl-text">退房，行李随身出发<br><small>LaLaport有投币寄存柜，KidZania前台也可寄存</small></div></div>
+<div class="tl-item"><div class="tl-time">08:30 - 08:50</div><div class="tl-text">中洲川端 → 竹下站，寄存行李</div></div>
+<div class="tl-item"><div class="tl-time">09:00 - 15:00</div><div class="tl-text">🏙️ KidZania福冈（6小时票）<br><small>约70种职业体验：消防员、飞行员、寿司师傅…<br>九州限定：高汤专门店、汉方研究所；热门职业进门先预约</small></div></div>
+<div class="tl-item"><div class="tl-time">15:00 - 15:15</div><div class="tl-text">取行李<br><small>⚠️ <strong>红线：15:15前必须离开LaLaport</strong>（赶18:15国际线）</small></div></div>
+<div class="tl-item"><div class="tl-time">15:15 - 16:00</div><div class="tl-text">🚃 竹下 → 博多 → 地铁空港线 → 福冈机场<br><small>约40min含换乘</small></div></div>
+<div class="tl-item"><div class="tl-time">16:00 - 17:45</div><div class="tl-text">✈️ MU5088值机/安检/免税店<br><small>国际线提前2h到，时间富余可逛免税店和明太子伴手礼</small></div></div>
+<div class="tl-item"><div class="tl-time">18:15 - 19:15</div><div class="tl-text">MU5088 福冈 → 上海浦东T1，再见九州！🌋</div></div>
 </div>
 
 <h3 class="day-subtitle">📍 地标详解</h3>
@@ -1676,6 +1724,10 @@ body{font-size:16.5px}
 </div>
 </div>
 
+<div class="tips-box" style="border-left-color:var(--ocean);background:linear-gradient(135deg,rgba(46,92,138,0.05),rgba(46,92,138,0.02))"><h4 style="color:var(--ocean)">🌧️ 雨天 Plan B</h4><ul>
+<li>KidZania全室内，下雨毫无影响</li>
+<li>大雨天地铁/JR照常运行，换乘走地下通道，多预留30min余量即可</li>
+</ul></div>
 <div class="tips-box">
 <h4>📝 Day 6 小贴士</h4>
 <ul>
@@ -1781,6 +1833,8 @@ body{font-size:16.5px}
 <div class="prep-card"><h4>💊 药品</h4><ul><li>肠胃药</li><li>晕车贴（天草海豚、阿苏山路）</li><li>创可贴</li><li>感冒药</li><li>防晒霜</li><li>驱蚊贴</li></ul></div>
 <div class="prep-card"><h4>📱 通讯</h4><ul><li>日本SIM卡 / eSIM</li><li>或随身WiFi租赁</li><li>下载Google Maps离线地图</li><li>下载换乘案内app</li><li>下载翻译app</li></ul></div>
 <div class="prep-card"><h4>👶 亲子</h4><ul><li>小零食（路上应急）</li><li>小玩具/绘本（巴士上用）</li><li>儿童保温杯</li><li>湿巾、纸巾</li><li>替换衣物（多备一套）</li><li>KidZania穿方便活动的衣服</li></ul></div>
+<div class="prep-card"><h4>💳 支付方式</h4><ul><li>IC卡：手机钱包开通Suica/PASMO，JR/地铁/巴士/便利店通用</li><li>必须现金的场景：中洲屋台（多数仅现金）、巴士车内购票、草千里小摊、神社御守</li><li>现金备5~8万日元，7-11 ATM支持银联/外卡取现</li><li>大商场/连锁店可刷VISA/Master，小店和屋台多数不收卡</li></ul></div>
+<div class="prep-card"><h4>🆘 应急信息</h4><ul><li>警察 110 · 救护/火警 119</li><li>外交部全球领保热线：+86-10-12308（24h中文）</li><li>中国驻福冈总领馆领保电话：092-753-6483（非工作时间自动转12308）</li><li>护照丢失：就近警署开遗失证明 → 领馆补办旅行证件</li><li>就医：先打保险公司24h中文热线（见保单）</li><li>Google翻译提前下载日语离线包</li></ul></div>
 </div>
 </div>
 </section>
@@ -1845,6 +1899,21 @@ if(el._leaflet_map)el._leaflet_map.invalidateSize();
 });
 })();
 
+// === MAP TOGGLE 折叠展开 ===
+(function(){
+document.querySelectorAll('.map-toggle').forEach(function(btn){
+btn.addEventListener('click',function(){
+var box=btn.closest('.map-container')||btn.parentElement;
+box.classList.toggle('open');
+var open=box.classList.contains('open');
+var hint=btn.querySelector('.mt-hint');
+if(hint)hint.textContent=open?'点击收起':'点击展开';
+var el=document.getElementById(btn.dataset.target);
+setTimeout(function(){try{if(el._leaflet_map)el._leaflet_map.invalidateSize()}catch(e){}},220);
+});
+});
+})();
+
 // === LEAFLET MAPS ===
 (function(){
 if(typeof L==='undefined'){console.warn('Leaflet not loaded');return}
@@ -1852,10 +1921,10 @@ if(typeof L==='undefined'){console.warn('Leaflet not loaded');return}
 // 让每个地图实例挂到容器上，供 Tab切换/滚动时的 invalidateSize 修复使用
 L.Map.addInitHook(function(){try{this._container._leaflet_map=this}catch(e){}});
 
-// 主源 CartoDB（日本地图细节最佳），备源 OSM（国内可访问、日本全覆盖）；高德瓦片不覆盖日本已弃用
+// 主源 OSM（免key、国内可达、日本全覆盖），备源 Esri 世界街道图（免key）；CARTO 2025年起要求apikey已弃用
 var tileSources=[
-{url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',opts:{subdomains:'abcd',attribution:'&copy; CARTO',maxZoom:18}},
-{url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',opts:{attribution:'&copy; OpenStreetMap contributors',maxZoom:19}}
+{url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',opts:{attribution:'&copy; OpenStreetMap contributors',maxZoom:19}},
+{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',opts:{attribution:'Tiles &copy; Esri',maxZoom:19}}
 ];
 
 // 加载瓦片；连续3片出错自动切换到下一个源（国内 CartoDB 不稳时无缝降级到 OSM）
