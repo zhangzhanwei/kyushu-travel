@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>九州六日 · 全家攻略 | きゅうしゅうの旅</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--volcano:#C1440E;--volcano-light:#D4623A;
+--onsen:#F8F6F0;--onsen-dark:#EDE9DE;
+--ocean:#2E5C8A;--ocean-light:#3D7AB8;--ocean-pale:#E8EFF6;
+--grass:#7BA05B;--grass-light:#9ABD7E;
+--pottery:#B8860B;--pottery-light:#D4A843;
+--indigo:#1B3A5C;--indigo-light:#2A5580;
+--ink:#2D2D2D;--ink-light:#5A5A5A;--ink-muted:#8A8A8A;
+--d1:#C1440E;--d2:#D4800E;--d3:#5B8C3E;--d4:#2E5C8A;--d5:#7B5EA7;--d6:#7A7A7A;
+--paper:#FBFAF5;--card-shadow:0 2px 12px rgba(45,45,45,0.07);
+--font-serif:'Noto Serif JP','Yu Mincho','Hiragino Mincho ProN',serif;
+--font-sans:'Noto Sans JP','Hiragino Sans','PingFang SC','Microsoft YaHei',sans-serif;
+}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:var(--font-sans);color:var(--ink);background:var(--paper);line-height:1.85;font-size:15px;-webkit-font-smoothing:antialiased}
+a{color:var(--ocean);text-decoration:none}
+h1,h2,h3,h4{font-family:var(--font-serif);font-weight:600;line-height:1.4}
+.seigaiha-bg{position:relative}
+.seigaiha-bg::after{content:"";position:absolute;inset:0;opacity:.03;pointer-events:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40'%3E%3Cpath d='M0 40a40 40 0 0 1 80 0' fill='none' stroke='%231B3A5C' stroke-width='1.5'/%3E%3Cpath d='M-40 40a40 40 0 0 1 80 0' fill='none' stroke='%231B3A5C' stroke-width='1.5'/%3E%3Cpath d='M40 40a40 40 0 0 1 80 0' fill='none' stroke='%231B3A5C' stroke-width='1.5'/%3E%3Cpath d='M0 20a20 20 0 0 1 40 0' fill='none' stroke='%231B3A5C' stroke-width='1'/%3E%3Cpath d='M40 20a20 20 0 0 1 40 0' fill='none' stroke='%231B3A5C' stroke-width='1'/%3E%3Cpath d='M-20 20a20 20 0 0 1 40 0' fill='none' stroke='%231B3A5C' stroke-width='1'/%3E%3C/svg%3E")}
+.hakata-divider{height:3px;margin:40px auto;max-width:300px;
+background:repeating-linear-gradient(90deg,var(--pottery) 0,var(--pottery) 8px,transparent 8px,transparent 12px,var(--ocean) 12px,var(--ocean) 20px,transparent 20px,transparent 24px);border-radius:2px;opacity:.6}
+.wave-sep{width:100%;overflow:hidden;line-height:0;position:relative}
+.wave-sep svg{display:block;width:100%;height:40px}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:9999;
+background:rgba(27,58,92,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+height:56px;display:flex;align-items:center;padding:0 20px;transition:box-shadow .3s;
+border-bottom:1px solid rgba(184,134,11,0.2)}
+.nav.scrolled{box-shadow:0 2px 24px rgba(27,58,92,0.25)}
+.nav::before{content:"";position:absolute;inset:0;opacity:.06;pointer-events:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='20' height='20' fill='none'/%3E%3Cpath d='M10 0v20M0 10h20' stroke='%23fff' stroke-width='.5'/%3E%3C/svg%3E")}
+.nav-inner{max-width:1200px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.nav-logo{font-family:var(--font-serif);font-size:16px;font-weight:700;color:var(--onsen);white-space:nowrap;letter-spacing:1px}
+.nav-logo small{font-size:10px;opacity:.6;display:block;letter-spacing:2px;font-weight:400;font-family:var(--font-sans)}
+.nav-links{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-links a{padding:6px 11px;border-radius:4px;font-size:13px;white-space:nowrap;color:rgba(248,246,240,0.8);transition:all .2s;letter-spacing:.5px}
+.nav-links a:hover,.nav-links a.active{background:rgba(248,246,240,0.15);color:var(--onsen)}
+.hamburger{display:none;font-size:22px;cursor:pointer;color:var(--onsen);background:none;border:none}
+@media(max-width:768px){
+.nav-links{display:none;position:absolute;top:56px;left:0;right:0;background:rgba(27,58,92,0.97);flex-direction:column;padding:12px 20px;gap:2px}
+.nav-links.open{display:flex}
+.nav-links a{padding:12px 16px;border-radius:4px;font-size:14px}
+.hamburger{display:block}
+}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,var(--indigo) 0%,var(--ocean) 40%,var(--volcano) 100%);
+color:var(--onsen);padding:110px 24px 70px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;
+background:radial-gradient(ellipse at 30% 80%,rgba(193,68,14,0.3),transparent 60%),
+radial-gradient(ellipse at 70% 20%,rgba(46,92,138,0.2),transparent 50%);pointer-events:none}
+.hero::after{content:"";position:absolute;bottom:0;left:0;right:0;height:120px;
+background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath d='M0,80 C200,40 400,100 600,60 C800,20 1000,80 1200,50 L1200,120 L0,120Z' fill='%23FBFAF5'/%3E%3C/svg%3E") no-repeat bottom/100% auto;pointer-events:none}
+.steam{position:absolute;bottom:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+.steam-wisp{position:absolute;border-radius:50%;background:rgba(248,246,240,0.04);filter:blur(30px);animation:steamRise linear infinite}
+@keyframes steamRise{0%{transform:translateY(0) scale(1);opacity:.5}50%{opacity:.8}100%{transform:translateY(-200px) scale(2);opacity:0}}
+.hero-content{position:relative;z-index:2;max-width:700px;margin:0 auto}
+.hero .jp-label{font-family:var(--font-serif);font-size:clamp(12px,2vw,14px);letter-spacing:6px;opacity:.7;margin-bottom:12px}
+.hero h1{font-size:clamp(30px,5.5vw,48px);margin-bottom:4px;letter-spacing:3px;text-shadow:0 2px 20px rgba(0,0,0,0.2)}
+.hero .subtitle{font-size:clamp(12px,2vw,15px);opacity:.7;letter-spacing:5px;margin-bottom:28px;text-transform:uppercase;font-weight:300}
+.hero .date{font-size:clamp(17px,3vw,24px);font-weight:300;margin-bottom:8px;letter-spacing:1px}
+.hero .summary{font-size:14px;opacity:.8;margin-bottom:20px;letter-spacing:1px}
+.hero .slogan{display:inline-block;background:rgba(248,246,240,0.1);border:1px solid rgba(248,246,240,0.25);border-radius:3px;padding:10px 28px;font-size:13px;letter-spacing:1.5px;font-family:var(--font-serif)}
+
+/* SECTIONS */
+.section{padding:60px 24px;max-width:1100px;margin:0 auto}
+.section-bg{background:var(--onsen-dark)}
+.section-title{text-align:center;margin-bottom:44px}
+.section-title h2{font-size:clamp(22px,4vw,30px);color:var(--indigo);margin-bottom:2px}
+.section-title .jp-sub{font-family:var(--font-serif);font-size:12px;color:var(--ink-muted);letter-spacing:3px;margin-bottom:4px}
+.section-title .num{display:inline-block;background:var(--volcano);color:var(--onsen);width:28px;height:28px;border-radius:3px;text-align:center;line-height:28px;font-size:13px;margin-right:8px;vertical-align:middle;font-family:var(--font-serif)}
+.section-title p{color:var(--ink-muted);font-size:13px;margin-top:6px}
+
+/* OVERVIEW TABLE */
+.overview-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:6px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(184,134,11,0.15)}
+.overview-table th{background:var(--indigo);color:var(--onsen);padding:12px 14px;font-size:13px;text-align:left;white-space:nowrap;font-weight:500;font-family:var(--font-serif);letter-spacing:.5px}
+.overview-table td{padding:12px 14px;border-bottom:1px solid rgba(184,134,11,0.08);font-size:13px;vertical-align:top;background:var(--paper)}
+.overview-table tr:last-child td{border-bottom:none}
+.overview-table tr:hover td{background:rgba(193,68,14,0.03)}
+.overview-table .day-badge{display:inline-block;padding:3px 10px;border-radius:3px;color:var(--onsen);font-size:12px;font-weight:700;font-family:var(--font-serif)}
+.overview-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* MAPS */
+.map-container{border-radius:8px;overflow:hidden;box-shadow:var(--card-shadow);margin:24px 0;border:1px solid rgba(184,134,11,0.12)}
+.map-container .map{height:400px;width:100%}
+.map-container.day-map .map{height:350px}
+.map-legend{display:flex;flex-wrap:wrap;gap:12px;padding:12px 16px;background:var(--paper);font-size:12px;border-top:1px solid rgba(184,134,11,0.08)}
+.map-legend span{display:flex;align-items:center;gap:5px;color:var(--ink-light)}
+.map-legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* HOTEL CARDS */
+.hotel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.hotel-card{background:var(--paper);border-radius:6px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(184,134,11,0.12);transition:transform .2s,box-shadow .2s}
+.hotel-card:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(45,45,45,0.1)}
+.hotel-card .hotel-header{padding:22px 24px;color:var(--onsen);position:relative;overflow:hidden}
+.hotel-card .hotel-header::after{content:"";position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(248,246,240,0.06)}
+.hotel-card .hotel-header h3{font-size:17px;margin-bottom:4px;letter-spacing:.5px}
+.hotel-card .hotel-header p{font-size:13px;opacity:.8}
+.hotel-card .hotel-body{padding:18px 24px}
+.hotel-card .hotel-body p{font-size:13px;color:var(--ink-light);margin-bottom:12px;line-height:1.7}
+.hotel-card .hotel-map{height:180px;border-radius:6px;overflow:hidden;margin:0 14px 14px;border:1px solid rgba(184,134,11,0.1)}
+.hotel-tag{display:inline-block;background:rgba(193,68,14,0.08);color:var(--volcano);padding:3px 10px;border-radius:3px;font-size:11px;margin:2px 4px 2px 0;border:1px solid rgba(193,68,14,0.12)}
+
+/* CHECKLIST */
+.checklist{max-width:700px;margin:0 auto}
+.checklist-item{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:var(--paper);border-radius:6px;margin-bottom:10px;box-shadow:0 1px 6px rgba(45,45,45,0.04);border:1px solid rgba(184,134,11,0.1);transition:all .2s;cursor:pointer}
+.checklist-item:hover{box-shadow:0 3px 12px rgba(45,45,45,0.08);border-color:rgba(193,68,14,0.2)}
+.checklist-item.done{opacity:.5}
+.checklist-item.done .cl-text{text-decoration:line-through}
+.cl-check{width:22px;height:22px;border-radius:4px;border:2px solid var(--ocean);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:all .2s}
+.checklist-item.done .cl-check{background:var(--volcano);border-color:var(--volcano)}
+.checklist-item.done .cl-check::after{content:"✓";color:var(--onsen);font-size:13px;font-weight:700}
+.cl-text{flex:1}
+.cl-text .cl-title{font-size:14px;font-weight:600;color:var(--ink)}
+.cl-text .cl-desc{font-size:12px;color:var(--ink-muted);margin-top:3px}
+
+/* ══ TAB SYSTEM ══ */
+.tab-section{padding:40px 0 60px}
+.tab-bar{max-width:1100px;margin:0 auto 0;padding:0 24px;display:flex;gap:0;border-bottom:3px solid var(--onsen-dark);position:sticky;top:56px;z-index:100;background:var(--paper)}
+.tab-btn{flex:1;padding:14px 8px;text-align:center;font-family:var(--font-serif);font-size:15px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--ink-muted);position:relative;transition:all .25s;letter-spacing:.5px}
+.tab-btn:hover{color:var(--ink);background:rgba(193,68,14,0.04)}
+.tab-btn.active{color:var(--volcano)}
+.tab-btn.active::after{content:"";position:absolute;bottom:-3px;left:10%;right:10%;height:3px;background:var(--volcano);border-radius:3px 3px 0 0}
+.tab-btn .tab-sub{display:block;font-size:11px;font-weight:400;font-family:var(--font-sans);color:var(--ink-muted);margin-top:2px;letter-spacing:0}
+.tab-btn.active .tab-sub{color:var(--volcano);opacity:.7}
+@media(max-width:768px){
+.tab-btn{font-size:13px;padding:12px 4px}
+.tab-btn .tab-sub{font-size:10px}
+}
+.tab-panel{display:none;max-width:1100px;margin:0 auto;padding:30px 24px 0}
+.tab-panel.active{display:block;animation:tabFade .35s ease}
+@keyframes tabFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* DAY HEADER in tab */
+.day-header{padding:24px 28px;border-radius:6px;color:var(--onsen);margin-bottom:30px;position:relative;overflow:hidden}
+.day-header::before{content:"";position:absolute;inset:0;opacity:.08;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 0L40 20L20 40L0 20Z' fill='none' stroke='%23fff' stroke-width='.8'/%3E%3C/svg%3E")}
+.day-header h2{font-size:clamp(18px,3.5vw,26px);margin-bottom:8px;letter-spacing:1px;position:relative}
+.day-header .day-meta{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;opacity:.9;position:relative}
+.day-header .day-meta span{display:flex;align-items:center;gap:4px}
+
+/* TRANSPORT STEPS */
+.transport-steps{margin:20px 0}
+.ts-step{background:var(--paper);border-radius:8px;padding:20px 24px;margin-bottom:14px;box-shadow:0 1px 8px rgba(45,45,45,0.05);border:1px solid rgba(184,134,11,0.1);position:relative;overflow:hidden}
+.ts-step::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.ts-step .ts-num{display:inline-block;background:var(--volcano);color:var(--onsen);width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:10px;flex-shrink:0}
+.ts-step .ts-title{font-size:15px;font-weight:600;color:var(--indigo);font-family:var(--font-serif);margin-bottom:10px;display:flex;align-items:center}
+.ts-step .ts-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;font-size:13px}
+.ts-step .ts-detail .ts-item{display:flex;align-items:flex-start;gap:6px;line-height:1.6}
+.ts-step .ts-detail .ts-icon{flex-shrink:0;width:20px;text-align:center}
+.ts-step .ts-tip{margin-top:12px;padding:10px 14px;background:rgba(193,68,14,0.05);border-radius:6px;font-size:12px;color:var(--volcano);border:1px solid rgba(193,68,14,0.1);line-height:1.6}
+@media(max-width:768px){.ts-step .ts-detail{grid-template-columns:1fr}}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:32px;margin:24px 0}
+.timeline::before{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;
+background:linear-gradient(to bottom,var(--ocean),var(--pottery-light),var(--volcano))}
+.tl-item{position:relative;margin-bottom:22px}
+.tl-item::before{content:"";position:absolute;left:-28px;top:7px;width:12px;height:12px;border-radius:50%;
+background:var(--volcano);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--volcano-light)}
+.tl-time{font-size:13px;font-weight:700;color:var(--volcano);margin-bottom:3px;font-family:var(--font-serif);letter-spacing:.5px}
+.tl-text{font-size:14px;color:var(--ink);line-height:1.7}
+.tl-text small{color:var(--ink-muted);font-size:12px;display:block;margin-top:2px}
+
+/* LANDMARK CARDS */
+.landmark-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;margin:18px 0}
+.landmark-card{background:var(--paper);border-radius:6px;padding:22px;box-shadow:var(--card-shadow);border-left:4px solid var(--ocean);transition:transform .2s;border-right:1px solid rgba(184,134,11,0.08);border-top:1px solid rgba(184,134,11,0.08);border-bottom:1px solid rgba(184,134,11,0.08)}
+.landmark-card:hover{transform:translateY(-2px)}
+.landmark-card h4{font-size:15px;color:var(--indigo);margin-bottom:10px;font-family:var(--font-serif)}
+.landmark-card .lc-row{display:flex;gap:8px;font-size:12px;color:var(--ink-light);margin-bottom:5px}
+.landmark-card .lc-row strong{color:var(--ink);min-width:48px;font-weight:500}
+.landmark-card .lc-history{background:rgba(46,92,138,0.05);border-radius:4px;padding:10px 14px;font-size:12px;margin:10px 0;color:var(--ocean);border:1px solid rgba(46,92,138,0.1);line-height:1.7}
+.landmark-card .lc-tip{background:rgba(193,68,14,0.06);border-radius:4px;padding:10px 14px;font-size:12px;margin-top:8px;color:var(--volcano);border:1px solid rgba(193,68,14,0.1);line-height:1.6}
+.landmark-card .lc-alt{background:rgba(123,160,91,0.06);border-radius:4px;padding:10px 14px;font-size:12px;margin-top:8px;color:var(--grass);border:1px solid rgba(123,160,91,0.12);line-height:1.6}
+@media(max-width:768px){.landmark-grid{grid-template-columns:1fr}}
+
+/* FOOD CARDS */
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin:18px 0}
+.food-card{background:var(--paper);border-radius:6px;padding:18px;box-shadow:0 1px 8px rgba(45,45,45,0.04);border:1px solid rgba(184,134,11,0.1);transition:transform .2s}
+.food-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(45,45,45,0.08)}
+.food-card .food-emoji{font-size:28px;margin-bottom:6px}
+.food-card h4{font-size:14px;margin-bottom:6px;font-family:var(--font-serif);color:var(--indigo)}
+.food-card p{font-size:12px;color:var(--ink-light);line-height:1.6}
+.food-card .food-price{display:inline-block;background:rgba(123,158,92,0.1);color:var(--grass);padding:3px 10px;border-radius:3px;font-size:11px;margin-top:8px;border:1px solid rgba(123,158,92,0.15);font-weight:500}
+
+/* TIPS */
+.tips-box{background:linear-gradient(135deg,rgba(193,68,14,0.04),rgba(184,134,11,0.04));border-radius:6px;padding:20px 24px;margin:20px 0;border:1px solid rgba(184,134,11,0.1);border-left:3px solid var(--pottery)}
+.tips-box h4{color:var(--volcano);margin-bottom:10px;font-size:14px;font-family:var(--font-serif)}
+.tips-box ul{list-style:none;padding:0}
+.tips-box li{font-size:13px;padding:4px 0;padding-left:20px;position:relative;line-height:1.7;color:var(--ink-light)}
+.tips-box li::before{content:"🔸";position:absolute;left:0;font-size:10px;top:6px}
+
+/* SUBTITLE */
+.day-subtitle{font-family:var(--font-serif);font-size:18px;color:var(--indigo);margin:32px 0 16px;padding-left:14px;border-left:3px solid var(--volcano);letter-spacing:.5px}
+
+/* BUDGET TABLE */
+.budget-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:6px;overflow:hidden;box-shadow:var(--card-shadow);font-size:13px;border:1px solid rgba(184,134,11,0.12)}
+.budget-table th{background:var(--indigo);color:var(--onsen);padding:12px 16px;text-align:left;font-family:var(--font-serif);font-weight:500;letter-spacing:.5px}
+.budget-table td{padding:11px 16px;border-bottom:1px solid rgba(184,134,11,0.06);background:var(--paper)}
+.budget-table tr:nth-child(even) td{background:rgba(248,246,240,0.5)}
+.budget-table tr.total td{font-weight:700;background:rgba(193,68,14,0.06);color:var(--volcano);font-size:14px;font-family:var(--font-serif)}
+
+/* FOOD OVERVIEW */
+.food-region{margin-bottom:40px}
+.food-region h3{font-size:18px;color:var(--indigo);margin-bottom:14px;display:flex;align-items:center;gap:10px;font-family:var(--font-serif)}
+.food-region h3::after{content:"";flex:1;height:1px;background:linear-gradient(to right,rgba(184,134,11,0.3),transparent)}
+
+/* PREP */
+.prep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.prep-card{background:var(--paper);border-radius:6px;padding:22px;box-shadow:var(--card-shadow);border:1px solid rgba(184,134,11,0.1)}
+.prep-card h4{font-size:15px;color:var(--indigo);margin-bottom:12px;font-family:var(--font-serif)}
+.prep-card ul{list-style:none;padding:0}
+.prep-card li{font-size:13px;padding:4px 0;padding-left:16px;position:relative;line-height:1.7;color:var(--ink-light)}
+.prep-card li::before{content:"•";position:absolute;left:2px;color:var(--volcano);font-weight:700}
+
+/* FOOTER */
+.footer{text-align:center;padding:48px 24px;background:var(--indigo);color:rgba(248,246,240,0.6);font-size:13px;position:relative;overflow:hidden}
+.footer::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+background:repeating-linear-gradient(90deg,var(--volcano) 0,var(--volcano) 12px,transparent 12px,transparent 16px,var(--pottery) 16px,var(--pottery) 28px,transparent 28px,transparent 32px)}
+.footer p{position:relative}
+.footer .footer-jp{font-family:var(--font-serif);font-size:11px;opacity:.5;margin-top:8px;letter-spacing:2px}
+
+/* SCROLL TOP */
+.scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--indigo);color:var(--onsen);border:2px solid rgba(184,134,11,0.3);font-size:16px;cursor:pointer;box-shadow:0 4px 16px rgba(27,58,92,0.3);opacity:0;transition:all .3s;z-index:999;display:flex;align-items:center;justify-content:center}
+.scroll-top.show{opacity:1}
+
+/* LEAFLET POPUP */
+.leaflet-popup-content-wrapper{border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.12)}
+.leaflet-popup-content{font-size:13px;line-height:1.6;margin:12px 16px}
+.leaflet-popup-content strong{color:var(--indigo);font-family:var(--font-serif)}
+.custom-marker{background:none;border:none}
+.marker-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.25);border:2px solid rgba(255,255,255,0.9)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.section{padding:36px 16px}
+.overview-table th,.overview-table td{padding:8px 10px;font-size:12px}
+.hotel-grid{grid-template-columns:1fr}
+.food-grid{grid-template-columns:1fr}
+.map-container .map{height:300px}
+.map-container.day-map .map{height:280px}
+.hero{padding:90px 16px 50px}
+.day-header{padding:18px}
+.hakata-divider{margin:28px auto}
+.tab-panel{padding:20px 16px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="navbar">
+<div class="nav-inner">
+<div class="nav-logo">🌋 九州六日<small>きゅうしゅうの旅</small></div>
+<button class="hamburger" id="menuBtn" aria-label="菜单">☰</button>
+<div class="nav-links" id="navLinks">
+<a href="#overview">総覽</a>
+<a href="#hotels">住宿</a>
+<a href="#booking">予約</a>
+<a href="#itinerary-tab">行程</a>
+<a href="#budget">予算</a>
+<a href="#food">美食</a>
+<a href="#map-overview-sec">地図</a>
+</div>
+</div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="hero">
+<div class="steam">
+<div class="steam-wisp" style="left:10%;width:120px;height:120px;animation-duration:8s;animation-delay:0s"></div>
+<div class="steam-wisp" style="left:30%;width:80px;height:80px;animation-duration:6s;animation-delay:2s"></div>
+<div class="steam-wisp" style="left:60%;width:100px;height:100px;animation-duration:9s;animation-delay:1s"></div>
+<div class="steam-wisp" style="left:80%;width:60px;height:60px;animation-duration:7s;animation-delay:3s"></div>
+<div class="steam-wisp" style="left:50%;width:140px;height:140px;animation-duration:10s;animation-delay:4s"></div>
+</div>
+<div class="hero-content">
+<div class="jp-label">きゅうしゅう の たび</div>
+<h1>九州六日 · 全家攻略</h1>
+<div class="subtitle">KYUSHU · FAMILY JOURNEY</div>
+<div class="date">2026.10.4 — 10.9</div>
+<div class="summary">6天5晚 ｜ 福冈 · 熊本 · 天草 · 阿苏 · 别府</div>
+<div class="slogan">🌋 火山 · 🐬 海豚 · 🐘 动物园 · 🍞 面包超人 · 🏙️ 职业体验 —— 每天都有高光</div>
+</div>
+</header>
+
+<!-- 壹 · 行程总览 -->
+<section class="section-bg seigaiha-bg" id="overview">
+<div class="section" style="padding-top:60px;padding-bottom:60px">
+<div class="section-title">
+<div class="jp-sub">いち · ごあんない</div>
+<h2><span class="num">壹</span>行程总览</h2>
+<p>六天五晚行程一览</p>
+</div>
+<div class="overview-table-wrap">
+<table class="overview-table">
+<thead><tr><th>日期</th><th>主题</th><th>交通方式</th><th>住宿</th><th>强度</th></tr></thead>
+<tbody>
+<tr><td><span class="day-badge" style="background:var(--d1)">D1</span> 10/4 周日</td><td>上海→福冈→熊本 · 熊本逛吃</td><td>✈️+🚌 约2h</td><td>The Blossom 熊本</td><td>★★☆</td></tr>
+<tr><td><span class="day-badge" style="background:var(--d2)">D2</span> 10/5 周一</td><td>天草追海豚 · 下午回熊本</td><td>🚌 往返约3.5h</td><td>The Blossom 熊本</td><td>★★★</td></tr>
+<tr><td><span class="day-badge" style="background:var(--d3)">D3</span> 10/6 周二</td><td>包车阿苏一日游 · 转场别府</td><td>🚐 包车10h</td><td>AMANEK BEPPU YULA-RE</td><td>★★★☆</td></tr>
+<tr><td><span class="day-badge" style="background:var(--d4)">D4</span> 10/7 周三</td><td>九州动物园 · 下午JR去福冈</td><td>🚌+🚃 约2h</td><td>Royal Park Canvas福冈中洲</td><td>★★★</td></tr>
+<tr><td><span class="day-badge" style="background:var(--d5)">D5</span> 10/8 周四</td><td>海之中道公园 · 面包超人博物馆</td><td>🚃+🚌 约1h</td><td>Royal Park Canvas福冈中洲</td><td>★★☆</td></tr>
+<tr><td><span class="day-badge" style="background:var(--d6)">D6</span> 10/9 周五</td><td>KidZania · 福冈→上海</td><td>🚃+✈️</td><td>—</td><td>★★☆</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<!-- 贰 · 城际交通总览地图 -->
+<section id="map-overview-sec">
+<div class="section">
+<div class="section-title">
+<div class="jp-sub">に · こうつうちず</div>
+<h2><span class="num">贰</span>城际交通总览</h2>
+<p>六天路线全景地图（可缩放拖动）</p>
+</div>
+<div class="map-container" id="map-overview-box">
+<div class="map" id="map-overview"></div>
+<div class="map-legend">
+<span><span class="dot" style="background:var(--d1)"></span>D1 福冈→熊本</span>
+<span><span class="dot" style="background:var(--d2)"></span>D2 熊本↔天草</span>
+<span><span class="dot" style="background:var(--d3)"></span>D3 阿苏包车线</span>
+<span><span class="dot" style="background:var(--d4)"></span>D4 动物园→福冈</span>
+<span><span class="dot" style="background:var(--d5)"></span>D5 海之中道</span>
+<span><span class="dot" style="background:var(--d6)"></span>D6 去机场</span>
+</div>
+</div>
+</div>
+</section>
+
+<div class="hakata-divider"></div>
+
+<!-- 叁 · 酒店 -->
+<section class="section-bg seigaiha-bg" id="hotels">
+<div class="section">
+<div class="section-title">
+<div class="jp-sub">さん · やど</div>
+<h2><span class="num">叁</span>住宿安排</h2>
+<p>三家精选酒店</p>
+</div>
+<div class="hotel-grid">
+<div class="hotel-card">
+<div class="hotel-header" style="background:linear-gradient(135deg,var(--indigo),var(--ocean))">
+<h3>🏨 The Blossom 熊本</h3>
+<p>熊本城附近 · 连住2晚 (10/4-6)</p>
+</div>
+<div class="hotel-body">
+<p>熊本核心地段，步行可达熊本城、上通商店街。交通便利，周边餐饮丰富，是探索熊本市区的理想据点。</p>
+<span class="hotel-tag">🏯 熊本城步行圈</span>
+<span class="hotel-tag">🛍️ 上通商店街</span>
+<span class="hotel-tag">📍 熊本核心</span>
+</div>
+<div class="hotel-map" id="hotel-map-1"></div>
+</div>
+<div class="hotel-card">
+<div class="hotel-header" style="background:linear-gradient(135deg,#2D2D2D,#4A4A4A)">
+<h3>♨️ AMANEK BEPPU YULA-RE</h3>
+<p>别府站前 · 1晚 (10/6-7)</p>
+</div>
+<div class="hotel-body">
+<p>JR别府站步行3min。顶楼无边际温泉泳池 + 14F公共温泉。工业风设计，2024 Good Design Award获奖。</p>
+<span class="hotel-tag">♨️ 无边温泉泳池</span>
+<span class="hotel-tag">🏆 Good Design Award</span>
+<span class="hotel-tag">🚉 站前3min</span>
+</div>
+<div class="hotel-map" id="hotel-map-2"></div>
+</div>
+<div class="hotel-card">
+<div class="hotel-header" style="background:linear-gradient(135deg,#5B3A6B,#7B5EA7)">
+<h3>🏮 THE Royal Park Canvas 福冈中洲</h3>
+<p>中洲川端 · 连住2晚 (10/7-9)</p>
+</div>
+<div class="hotel-body">
+<p>中洲川端站直通，步行可达运河城、川端商店街。中洲屋台就在附近，福冈夜生活的最佳据点。</p>
+<span class="hotel-tag">🚇 地铁站直通</span>
+<span class="hotel-tag">🏮 中洲屋台</span>
+<span class="hotel-tag">🛍️ 运河城步行圈</span>
+</div>
+<div class="hotel-map" id="hotel-map-3"></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 肆 · 预订清单 -->
+<section id="booking">
+<div class="section">
+<div class="section-title">
+<div class="jp-sub">よん · ごやくリスト</div>
+<h2><span class="num">肆</span>出发前预订清单</h2>
+<p>点击可勾选，状态自动保存</p>
+</div>
+<div class="checklist" id="checklist">
+<div class="checklist-item" data-key="t2"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🐬 天草海豚观赏</div><div class="cl-desc">提前1-2周 · KKday路线巴士一日游约10,600日元/人</div></div></div>
+<div class="checklist-item" data-key="aso"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🌋 阿苏包车</div><div class="cl-desc">提前1-2周 · 7人座，熊本→别府，10h / 约2,300元</div></div></div>
+<div class="checklist-item" data-key="zoo"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🐘 九州动物园丛林巴士</div><div class="cl-desc">每月15日预约次月平日下午场 · 官网预约</div></div></div>
+<div class="checklist-item" data-key="kidzania"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🏙️ KidZania福冈</div><div class="cl-desc">提前网上预约 · 9:00-15:00的6小时票</div></div></div>
+<div class="checklist-item" data-key="anpanman"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🍞 面包超人博物馆</div><div class="cl-desc">可网上或当日购买 · 2,000-2,200日元/人(1岁+)</div></div></div>
+<div class="checklist-item" data-key="bus"><div class="cl-check"></div><div class="cl-text"><div class="cl-title">🚌 福冈机场→熊本巴士</div><div class="cl-desc">当日乘车无需预约 · ひのくに号 2,500日元/人</div></div></div>
+</div>
+</div>
+</section>
+
+<div class="hakata-divider"></div>
+
+<!-- ═══════ TAB ITINERARY ═══════ -->
+<section class="tab-section" id="itinerary-tab">
+<div class="section-title" style="padding:0 24px 10px">
+<div class="jp-sub">ご · まいにちのたび</div>
+<h2><span class="num">伍</span>每日行程攻略</h2>
+<p>点击日期Tab查看详细攻略</p>
+</div>
+
+<div class="tab-bar" id="tabBar">
+<button class="tab-btn active" data-tab="d1">D1 · 10/4<span class="tab-sub">上海→熊本</span></button>
+<button class="tab-btn" data-tab="d2">D2 · 10/5<span class="tab-sub">天草海豚</span></button>
+<button class="tab-btn" data-tab="d3">D3 · 10/6<span class="tab-sub">阿苏火山</span></button>
+<button class="tab-btn" data-tab="d4">D4 · 10/7<span class="tab-sub">动物园→福冈</span></button>
+<button class="tab-btn" data-tab="d5">D5 · 10/8<span class="tab-sub">海之中道</span></button>
+<button class="tab-btn" data-tab="d6">D6 · 10/9<span class="tab-sub">KidZania</span></button>
+</div>
+
+<!-- ═══ D1 TAB ═══ -->
+<div class="tab-panel active" id="panel-d1">
+<div class="day-header" style="background:linear-gradient(135deg,var(--d1),#9E3608)">
+<h2>📍 D1 · 10月4日（周日）上海→福冈→熊本</h2>
+<div class="day-meta"><span>🏨 The Blossom 熊本</span><span>✈️+🚌 约2h</span><span>强度 ★★☆</span></div>
+</div>
+
+<div class="map-container day-map"><div class="map" id="map-d1"></div></div>
+
+<h3 class="day-subtitle">🚩 交通攻略</h3>
+<div class="transport-steps">
+<div class="ts-step" style="--step-color:var(--d1)"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d1);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d1)">1</span>✈️ 上海 → 福冈（飞机）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">⏰</span>约2小时飞行</div>
+<div class="ts-item"><span class="ts-icon">📍</span>福冈机场国际线航站楼到达</div>
+<div class="ts-item"><span class="ts-icon">📋</span>入境→取行李→过海关，预留约1h</div>
+<div class="ts-item"><span class="ts-icon">💡</span>入境后到国内线航站楼2F换乘巴士</div>
+</div>
+<div class="ts-tip">💡 福冈机场离市区极近，国际线与国内线航站楼之间有免费接驳巴士（约5min），也可以步行（约10min）</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d1);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d1)">2</span>🚌 福冈机场 → 熊本（高速巴士）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>国内线航站楼 <strong>2F 巴士乘车处</strong></div>
+<div class="ts-item"><span class="ts-icon">🚌</span>乘坐：<strong>「ひのくに号」</strong>高速巴士（熊本·大分行）</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>车程约 <strong>1小时55分</strong></div>
+<div class="ts-item"><span class="ts-icon">💰</span>2,500日元/人（车内支付 / IC卡可用）</div>
+<div class="ts-item"><span class="ts-icon">📋</span>每30~60分钟一班，<strong>无需预约</strong>，自由席</div>
+<div class="ts-item"><span class="ts-icon">🚻</span>车内设施：4列独立座椅 / 免费WiFi / 充电口 / 车载厕所</div>
+</div>
+<div class="ts-tip">💡 巴士座位宽敞舒适（4列而非普通巴士的3列），有独立扶手和阅读灯。行李放在车内行李架或车底行李舱。建议提前在站台排队，座位先到先得。</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d1);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d1)">3</span>🚕 熊本樱町BT → 酒店（出租车）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>到达 <strong>熊本樱町巴士总站（Sakura-machi BT）</strong></div>
+<div class="ts-item"><span class="ts-icon">🚕</span>打车到 The Blossom 熊本，约5分钟</div>
+<div class="ts-item"><span class="ts-icon">💰</span>约500~700日元（起步价）</div>
+<div class="ts-item"><span class="ts-icon">🚶</span>也可步行约15分钟到达</div>
+</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">📋 时间轴</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-time">落地后</div><div class="tl-text">入境取行李，乘免费接驳到国内线航站楼，在2F乘「ひのくに号」高速巴士<br><small>站台有明显标识「熊本行き」</small></div></div>
+<div class="tl-item"><div class="tl-time">约2h后</div><div class="tl-text">抵达熊本樱町BT，打车前往The Blossom酒店<br><small>办理入住，稍事休整</small></div></div>
+<div class="tl-item"><div class="tl-time">16:00 - 18:00</div><div class="tl-text">🏯 熊本城外观散步<br><small>天守阁黑色外观壮美，傍晚拍照最佳。城墙石垣在夕阳下格外震撼</small></div></div>
+<div class="tl-item"><div class="tl-time">18:00 - 20:00</div><div class="tl-text">🍜 晚餐：熊本拉面 / 马刺し<br><small>推荐上通商店街附近觅食，「桂花ラーメン」或「黒亭」都是名店</small></div></div>
+<div class="tl-item"><div class="tl-time">20:00</div><div class="tl-text">回酒店休息，为明天天草之行养精蓄锐</div></div>
+</div>
+
+<h3 class="day-subtitle">📍 地标详解</h3>
+<div class="landmark-grid">
+<div class="landmark-card" style="border-left-color:var(--d1)">
+<h4>🏯 熊本城 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">くまもとじょう</small></h4>
+<div class="lc-row"><strong>门票</strong>约800日元/人</div>
+<div class="lc-row"><strong>建议</strong>外观散步30~60min，或入园1.5h</div>
+<div class="lc-row"><strong>交通</strong>酒店步行约15min</div>
+<div class="lc-history">📜 <strong>历史：</strong>1599年由战国名将加藤清正开始筑城，1607年完工。别名「银杏城」，传说清正亲手种下银杏树作为战时应急粮食。是日本三名城之一，黑色天守的「反り」曲线是清正独创的筑城风格。<br>1877年西南战争中天守阁被焚毁，1960年市民捐款以钢筋混凝土重建。2016年熊本地震严重受损，2021年完成修复重新开放。城中至今保留着筑城时的「波形削痕」——工匠用锛子加工柱子留下的痕迹，是400年前的工匠留下的"指纹"。</div>
+<div class="lc-tip">💡 熊本城夜间有灯光照明，傍晚拍照最美。天守阁内部是博物馆，展示加藤清正和细川家族的历史文物。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>加藤神社（清正公さん）→ 二之丸公园（樱花名所）→ 熊本城彩未花园（薰衣草花田）</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d1)">
+<h4>🛍️ 上通商店街 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">かみとおり</small></h4>
+<div class="lc-row"><strong>亮点</strong>熊本最繁华商业街，约180家店铺</div>
+<div class="lc-row"><strong>门票</strong>免费</div>
+<div class="lc-row"><strong>建议</strong>30~60min</div>
+<div class="lc-row"><strong>交通</strong>酒店步行5min</div>
+<div class="lc-history">📜 上通是熊本城下町时代的商业核心区，从江户时代延续至今。这里曾是参勤交代队伍经过的街道，如今汇聚了各种熊本特产店、甜品屋和餐厅。</div>
+<div class="lc-tip">💡 推荐尝试「からし蓮根」(芥末莲藕)和「いきなり団子」(红薯馒头)，都是熊本传统点心。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>下通商店街（更年轻潮流）→ 桜の馬場 城彩苑（熊本特产集合）→ 水前寺成趣园（东京都心才有的江户庭园）</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">🍜 美食推荐</h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🍜</div><h4>熊本拉面（黒蒜油豚骨）</h4><p>浓郁豚骨汤底 + 焦香蒜油，熊本灵魂美食。推荐名店「桂花」「黒亭」</p><span class="food-price">约900日元</span></div>
+<div class="food-card"><div class="food-emoji">🥩</div><h4>马肉刺身（马刺し）</h4><p>熊本名物，新鲜马肉切薄片，搭配姜泥酱油。推荐「 topst 」或马肉料理专门店</p><span class="food-price">约1,500日元</span></div>
+<div class="food-card"><div class="food-emoji">🌿</div><h4>辛子蓮根</h4><p>莲藕孔中填入芥末味噌后裹面衣油炸，细川藩时代的料理传承</p><span class="food-price">约500日元</span></div>
+</div>
+
+<div class="tips-box">
+<h4>📝 Day 1 小贴士</h4>
+<ul>
+<li>「ひのくに号」在福冈机场国内线航站楼2F乘车，站台有电子屏显示发车时间</li>
+<li>巴士有4列独立座椅，带厕所、WiFi、充电口，非常舒适，比JR更方便</li>
+<li>熊本城夜间有灯光照明，傍晚拍照很美</li>
+<li>熊本IC卡「くまモンのIC CARD」可在市内巴士使用</li>
+<li>熊本机场→市区也可选择JR（需在博多换乘），但高速巴士最直达</li>
+</ul>
+</div>
+</div>
+
+<!-- ═══ D2 TAB ═══ -->
+<div class="tab-panel" id="panel-d2">
+<div class="day-header" style="background:linear-gradient(135deg,var(--d2),#B86A08)">
+<h2>🐬 D2 · 10月5日（周一）天草追海豚</h2>
+<div class="day-meta"><span>🏨 The Blossom 熊本</span><span>🚌 往返约3.5h</span><span>强度 ★★★</span></div>
+</div>
+
+<div class="map-container day-map"><div class="map" id="map-d2"></div></div>
+
+<h3 class="day-subtitle">🚩 交通攻略</h3>
+<div class="transport-steps">
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d2);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d2)">1</span>🚶 酒店 → 熊本樱町BT</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚶</span>酒店步行约10min到樱町BT</div>
+<div class="ts-item"><span class="ts-icon">📍</span>在 <strong>3号站台</strong> 等候快速巴士</div>
+</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d2);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d2)">2</span>🚌 熊本 → 天草（快速巴士）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚌</span>乘坐：<strong>快速巴士「天草号」</strong></div>
+<div class="ts-item"><span class="ts-icon">🕘</span>09:25 樱町BT出发 → 11:06 抵达Risola Terrace天草</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>车程约 <strong>1小时40分</strong></div>
+<div class="ts-item"><span class="ts-icon">💰</span>KKday套票内含，无需另购</div>
+<div class="ts-item"><span class="ts-icon">📋</span>含在KKday「天草海豚一日游」套票中</div>
+</div>
+<div class="ts-tip">💡 KKday套票（约10,600日元/人）包含：往返巴士+海豚观赏游船(2h)+海景BBQ午餐，是最省心的方案。也可选择自由行：JR到三角站+渡轮到天草，但换乘复杂不推荐。</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d2);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d2)">3</span>🚌 天草 → 熊本（回程巴士）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚌</span>下午/傍晚乘回程巴士（套票含）</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约1h40min回到熊本樱町BT</div>
+<div class="ts-item"><span class="ts-icon">📍</span>从Risora Terrace天草乘车点出发</div>
+</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">📋 时间轴</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-time">08:30</div><div class="tl-text">酒店出发前往熊本樱町BT</div></div>
+<div class="tl-item"><div class="tl-time">09:25</div><div class="tl-text">乘快速巴士"天草号"出发<br><small>含在KKday套票内，出示二维码上车</small></div></div>
+<div class="tl-item"><div class="tl-time">11:06</div><div class="tl-text">抵达Risola Terrace天草</div></div>
+<div class="tl-item"><div class="tl-time">11:30</div><div class="tl-text">午餐：海景BBQ<br><small>套餐内含，在天草海滨边看海景边享用</small></div></div>
+<div class="tl-item"><div class="tl-time">13:00 - 15:00</div><div class="tl-text">🐬 出海观赏海豚（约2h）<br><small>天草海域约200头野生南瓶鼻海豚，相遇率极高！</small></div></div>
+<div class="tl-item"><div class="tl-time">15:00 - 16:00</div><div class="tl-text">自由活动，天草街区散步<br><small>可以逛逛天草特产店、珍珠店</small></div></div>
+<div class="tl-item"><div class="tl-time">下午/傍晚</div><div class="tl-text">乘回程巴士返回熊本</div></div>
+<div class="tl-item"><div class="tl-time">18:00</div><div class="tl-text">抵达熊本，晚餐</div></div>
+</div>
+
+<h3 class="day-subtitle">📍 地标详解</h3>
+<div class="landmark-grid">
+<div class="landmark-card" style="border-left-color:var(--d2)">
+<h4>🐬 天草海豚观赏 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">あまくさ</small></h4>
+<div class="lc-row"><strong>门票</strong>含在KKday套票中</div>
+<div class="lc-row"><strong>建议</strong>预留2h</div>
+<div class="lc-row"><strong>船型</strong>有室内空间，适合亲子</div>
+<div class="lc-history">📜 <strong>天草的故事：</strong>天草是九州西海岸的群岛地区，由120多个岛屿组成。江户时代，这里是「隐蔽基督徒」的历史舞台——1637年岛原·天草起义失败后，天主教徒被迫潜伏，秘密传承信仰长达250年。2018年「长崎与天草地区的潜伏基督徒相关遗产」被列入世界文化遗产。天草海域的温暖潮流孕育了约200头南瓶鼻海豚，它们全年栖息于此，相遇率高达90%以上。</div>
+<div class="lc-tip">💡 相遇率极高但非100%，因天气取消可全额退费。游船有室内空间，晕船的朋友也不用太担心。建议带防晒霜、墨镜。</div>
+<div class="lc-alt">🔄 <strong>自由行备选：</strong>JR到三角站(45min)→渡轮到天草(40min)→当地海豚观赏，但换乘复杂且耗时更长</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d2)">
+<h4>🏖️ Risola Terrace天草</h4>
+<div class="lc-row"><strong>亮点</strong>天草海滨商业设施，海景BBQ</div>
+<div class="lc-row"><strong>门票</strong>免费</div>
+<div class="lc-row"><strong>建议</strong>午餐+自由活动 1~2h</div>
+<div class="lc-tip">💡 海景BBQ午餐在附近，环境优美。附近有珍珠展示馆和天草特产店。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>崎津天主堂（世界遗产，约20min车程）→ 天草四郎时贞纪念馆 → 天草珍珠养殖体验</div>
+</div>
+</div>
+
+<div class="tips-box">
+<h4>📝 Day 2 小贴士</h4>
+<ul>
+<li>KKday路线巴士一日游最省心：含往返巴士+海豚观赏+午餐，约10,600日元/人</li>
+<li>天草海域海豚相遇率极高，但属野生动物不保证100%看到</li>
+<li>因天气原因取消可全额退费</li>
+<li>建议带防晒霜、墨镜，海上阳光较强</li>
+<li>如有余裕，可考虑提前一天去天草住一晚（但行程会更紧凑）</li>
+</ul>
+</div>
+</div>
+
+</section>
+
+<!-- ═══ D3 TAB ═══ -->
+<div class="tab-panel" id="panel-d3">
+<div class="day-header" style="background:linear-gradient(135deg,var(--d3),#3D6B20)">
+<h2>🌋 D3 · 10月6日（周二）包车阿苏一日游 → 别府</h2>
+<div class="day-meta"><span>🏨 AMANEK BEPPU YULA-RE</span><span>🚐 包车10h</span><span>强度 ★★★☆</span></div>
+</div>
+
+<div class="map-container day-map"><div class="map" id="map-d3"></div></div>
+
+<h3 class="day-subtitle">🚩 交通攻略</h3>
+<div class="transport-steps">
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d3);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d3)">1</span>🚐 包车全天（熊本→阿苏→别府）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚐</span><strong>7人座包车</strong>（Alphard/Noah级别）</div>
+<div class="ts-item"><span class="ts-icon">📍</span>司机酒店接→熊本→大观峰→火山口→草千里→阿苏神社→别府</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>全天约 <strong>10小时</strong>（含车程+停留）</div>
+<div class="ts-item"><span class="ts-icon">💰</span>约 <strong>2,300元/车</strong>（含燃油+司机餐食+300km）</div>
+<div class="ts-item"><span class="ts-icon">📋</span>超时费5,000日元/h，高速停车费另付</div>
+</div>
+<div class="ts-tip">💡 包车是探索阿苏最灵活的方式。阿苏公共交通稀少，没有包车很难在一天内走完大观峰→火山口→草千里→神社→别府这条线路。建议提前在KKday或日本包车平台预约。</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">📋 时间轴</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-time">08:00</div><div class="tl-text">退房，行李上车，包车司机酒店接</div></div>
+<div class="tl-item"><div class="tl-time">08:00 - 09:30</div><div class="tl-text">熊本 → 大观峰（约90min车程）<br><small>沿途可见阿苏外轮山的壮阔轮廓</small></div></div>
+<div class="tl-item"><div class="tl-time">09:30 - 10:10</div><div class="tl-text">⛰️ 大观峰展望台<br><small>海拔935m，360°全景看阿苏五岳如释迦涅槃像</small></div></div>
+<div class="tl-item"><div class="tl-time">10:10 - 10:50</div><div class="tl-text">前往阿苏中岳火山口<br><small>沿途经过卡德里的峡谷、米冢等景点</small></div></div>
+<div class="tl-item"><div class="tl-time">10:50 - 11:30</div><div class="tl-text">🌋 阿苏中岳火山口<br><small>世界最大活火山口之一，俯瞰碧绿色溶池</small></div></div>
+<div class="tl-item"><div class="tl-time">11:30 - 12:00</div><div class="tl-text">前往草千里</div></div>
+<div class="tl-item"><div class="tl-time">12:00 - 13:00</div><div class="tl-text">🐴 草千里滨散步 + 午餐<br><small>赤牛盖饭！广阔草原，可看放牧牛马</small></div></div>
+<div class="tl-item"><div class="tl-time">13:00 - 14:30</div><div class="tl-text">⛩️ 阿苏神社 + 门前町商店街<br><small>罕见的横向参道、水基巡礼打卡</small></div></div>
+<div class="tl-item"><div class="tl-time">14:30 - 15:00</div><div class="tl-text">可选：锅瀑布<br><small>如时间充裕，步行约10min可达</small></div></div>
+<div class="tl-item"><div class="tl-time">15:00 - 17:00</div><div class="tl-text">阿苏 → 别府（约2h车程）<br><small>翻越九重连山，沿途风景壮美</small></div></div>
+<div class="tl-item"><div class="tl-time">17:00</div><div class="tl-text">♨️ 入住AMANEK BEPPU，顶楼温泉泳池放松！</div></div>
+<div class="tl-item"><div class="tl-time">19:00</div><div class="tl-text">🍗 别府站前觅食<br><small>大分名物 とり天（鸡肉天妇罗）</small></div></div>
+</div>
+
+<h3 class="day-subtitle">📍 地标详解</h3>
+<div class="landmark-grid">
+<div class="landmark-card" style="border-left-color:var(--d3)">
+<h4>⛰️ 大观峰 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">たいかんぼう</small></h4>
+<div class="lc-row"><strong>海拔</strong>935m · 阿苏外轮山北缘</div>
+<div class="lc-row"><strong>建议</strong>30~40min</div>
+<div class="lc-history">📜 <strong>看点：</strong>大观峰是阿苏最佳观景点。从这里眺望阿苏五岳（高岳、中岳、杵岛岳、乌帽子岳、根子岳），五座山峰宛如释迦涅槃像横卧天际——这就是著名的「涅槃像」景观。天气好时，甚至可以俯瞰整个破火山口底部冒烟的中岳火山口。被米其林绿色指南评为三星级景点。</div>
+<div class="lc-tip">💡 这是全程最佳拍照点，建议多留时间。早晨有云海时尤其壮美。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>米冢（完美圆锥形火山丘，步行5min）→ 卡德利峡谷（观景台+咖啡厅）</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d3)">
+<h4>🌋 阿苏中岳火山口 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">あそなかだけ</small></h4>
+<div class="lc-row"><strong>门票</strong>免费（停车费100日元）</div>
+<div class="lc-row"><strong>建议</strong>30~40min</div>
+<div class="lc-row"><strong>海拔</strong>1,506m</div>
+<div class="lc-history">📜 <strong>地球在呼吸：</strong>阿苏是世界上最古老的火山之一，约27万~9万年前经历了四次超级大喷发，其中最大的一次喷出物超过600立方公里，火山灰甚至飘到了北海道。中岳是阿苏五岳中唯一仍在活动的山峰。7世纪中国《隋书》就有记载阿苏火山活动的文字，是日本最早被海外文献记录的火山。站在火山口边缘，能闻到硫磺味、听到地底的轰鸣，看到碧绿色的溶池——这是地球在呼吸。</div>
+<div class="lc-tip">⚠️ 可能因火山气体浓度过高而管制关闭。前往之前请确认<a href="https://www.asovolcano.com/" target="_blank">火山口实时信息</a>。如关闭，可去阿苏火山博物馆看实时摄像头画面。</div>
+<div class="lc-alt">🔄 <strong>备选方案：</strong>火山口关闭时 → 阿苏火山博物馆（实时影像）→ 米冢（3000年前的火山丘）→ 内牧温泉（30+泉源的温泉街）</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d3)">
+<h4>🐴 草千里滨 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">くさせんり</small></h4>
+<div class="lc-row"><strong>面积</strong>78.5万㎡ · 日本最大草原</div>
+<div class="lc-row"><strong>建议</strong>散步+午餐约1h</div>
+<div class="lc-history">📜 <strong>千年牧场：</strong>草千里的草原已有一千多年的放牧历史。每年3月，当地农民会进行「野烧」——放火烧枯草，这个传统延续了千年。火山灰土壤不适合种稻，但人们学会了与火山共存：烧荒→施肥→新芽→放牧，形成了独特的人与自然共生系统。2013年被FAO认定为世界农业遗产（GIAHS）。在这里可以看到自由放牧的阿苏赤牛和马匹，远处是冒烟的火山口。</div>
+<div class="lc-tip">💡 赤牛盖饭（あか牛丼）是阿苏名物，在草原边的餐厅用餐，看着牛马漫步，体验绝佳。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>骑马体验（30min约3,000日元）→ 阿苏火山博物馆 → 米冢散步</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d3)">
+<h4>⛩️ 阿苏神社 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">あそじんじゃ</small></h4>
+<div class="lc-row"><strong>创建</strong>公元前281年 · 日本最古老神社之一</div>
+<div class="lc-row"><strong>门票</strong>免费</div>
+<div class="lc-row"><strong>建议</strong>1~1.5h</div>
+<div class="lc-history">📜 <strong>创世神话：</strong>阿苏神社的主祭神是「健磐龙命」——传说中他用脚踢开阿苏盆地的山壁，排出湖水，让阿苏成为可耕之地。这是日本最古老的火山创世神话之一。神社的「横向参道」非常罕见（通常神社参道是纵向的），据说是因为火山地形的特殊布局。神社楼门曾是国宝级建筑，2016年地震中倒塌，目前正在用传统木工技法修复中，预计数年内完工。神社的「阿苏的农耕祭事」被指定为国家重要无形民俗文化财产，祭祀火山的和平与丰收。</div>
+<div class="lc-tip">💡 门前町商店街有很多特色小店和甜品。推荐尝试「御火祭」限定甜品和「水基巡礼」（用神社附近的涌泉水打卡）。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>锅瀑布（步行10min）→ 内牧温泉街散步 → 阿苏牧之路骑行</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">🍜 美食推荐</h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🥩</div><h4>赤牛盖饭（あか牛丼）</h4><p>阿苏名物！红色牛肉铺满米饭，肉质鲜嫩多汁。在草千里附近的餐厅享用</p><span class="food-price">约1,200日元</span></div>
+<div class="food-card"><div class="food-emoji">🍲</div><h4>面疙瘩汤（だご汁）</h4><p>九州乡土料理，手捏面疙瘩配蔬菜味噌汤，暖身佳品。阿苏10月已凉，喝一碗很舒服</p><span class="food-price">约800日元</span></div>
+</div>
+
+<div class="tips-box">
+<h4>📝 Day 3 小贴士</h4>
+<ul>
+<li>阿苏10月初约10~18°C，比熊本市低5~8度，务必带外套！</li>
+<li>火山口可能因气体浓度关闭，关注<a href="https://www.asovolcano.com/" target="_blank">官网实时信息</a></li>
+<li>包车费用约2,300元/车（7人座），含燃油+司机餐食+300km</li>
+<li>超时费5,000日元/h，高速停车费另付（预估约2,000~3,000日元）</li>
+<li>大观峰是全程最佳拍照点，建议多留时间</li>
+<li>AMANEK的顶楼温泉泳池是此酒店最大亮点，别错过！</li>
+</ul>
+</div>
+</div>
+
+<!-- ═══ D4 TAB ═══ -->
+<div class="tab-panel" id="panel-d4">
+<div class="day-header" style="background:linear-gradient(135deg,var(--d4),#1D3D5C)">
+<h2>🐘 D4 · 10月7日（周三）九州动物园 → 福冈</h2>
+<div class="day-meta"><span>🏨 Royal Park Canvas福冈中洲</span><span>🚌+🚃 约2h</span><span>强度 ★★★</span></div>
+</div>
+
+<div class="map-container day-map"><div class="map" id="map-d4"></div></div>
+
+<h3 class="day-subtitle">🚩 交通攻略</h3>
+<div class="transport-steps">
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d4);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d4)">1</span>🚌 别府站 → 九州自然动物园</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>别府站前 <strong>龟之井巴士</strong> 乘车处（4号站台附近）</div>
+<div class="ts-item"><span class="ts-icon">🚌</span>乘坐：<strong>龟之井巴士 41路系统</strong>（朝地·宇目行）</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约 <strong>40分钟</strong></div>
+<div class="ts-item"><span class="ts-icon">💰</span>约 <strong>700日元/人</strong>（车内支付）</div>
+<div class="ts-item"><span class="ts-icon">📋</span>约每30~60min一班</div>
+</div>
+<div class="ts-tip">💡 在「九州自然动物园入口」巴士站下车即是。回程也在同站乘车。</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d4);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d4)">2</span>🚌 动物园 → 别府站（回程）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚌</span>同路线返回，在「九州自然动物园入口」站乘车</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约40min到别府站</div>
+<div class="ts-item"><span class="ts-icon">💰</span>约700日元/人</div>
+</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d4);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d4)">3</span>🚃 别府 → 博多（JR特急）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>JR别府站 <strong>1号站台</strong></div>
+<div class="ts-item"><span class="ts-icon">🚃</span>乘坐：<strong>JR特急「ソニック」（音速号/Sonic）</strong></div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约 <strong>2小时</strong></div>
+<div class="ts-item"><span class="ts-icon">💰</span>指定席约 <strong>4,690日元/人</strong></div>
+<div class="ts-item"><span class="ts-icon">📋</span>建议提前在车站购买指定席（特急券+乘车券分开买）</div>
+<div class="ts-item"><span class="ts-icon">💺</span>Sonic号是特色列车，蓝色流线型车身，车内有自由席和指定席</div>
+</div>
+<div class="ts-tip">💡 如有JR九州铁路周游券（3日券约10,000日元），可覆盖此段。但本次行程单买更划算。建议在博多站买指定席，旺季可能满座。</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d4);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d4)">4</span>🚃 博多 → 中洲川端（地铁）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>JR博多站 → 地铁博多站（地下直通）</div>
+<div class="ts-item"><span class="ts-icon">🚃</span>乘坐：<strong>地铁空港线</strong>（天神方向）</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>1站，约 <strong>2分钟</strong></div>
+<div class="ts-item"><span class="ts-icon">💰</span><strong>210日元</strong></div>
+<div class="ts-item"><span class="ts-icon">📍</span>在 <strong>中洲川端站</strong> 下车，酒店直通</div>
+</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">📋 时间轴</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-time">08:00</div><div class="tl-text">早餐，享受AMANEK最后的早晨</div></div>
+<div class="tl-item"><div class="tl-time">08:30</div><div class="tl-text">别府站前乘龟之井巴士41路</div></div>
+<div class="tl-item"><div class="tl-time">09:15</div><div class="tl-text">抵达九州自然动物园</div></div>
+<div class="tl-item"><div class="tl-time">09:30 - 12:00</div><div class="tl-text">🐘 Fureai Zone（互动区）<br><small>9种动物亲密接触 + 尝试购买丛林巴士票</small></div></div>
+<div class="tl-item"><div class="tl-time">12:00 - 13:00</div><div class="tl-text">园内午餐</div></div>
+<div class="tl-item"><div class="tl-time">15:10 - 16:00</div><div class="tl-text">🚌 丛林巴士 Safari Zone！<br><small>铁笼车穿越猛兽区，近距离看狮子老虎</small></div></div>
+<div class="tl-item"><div class="tl-time">16:00 - 16:40</div><div class="tl-text">巴士返回别府站</div></div>
+<div class="tl-item"><div class="tl-time">17:00</div><div class="tl-text">🚃 JR特急音速号前往博多<br><small>约2h车程，车上休息</small></div></div>
+<div class="tl-item"><div class="tl-time">19:00</div><div class="tl-text">抵达福冈博多，地铁前往中洲川端<br><small>入住THE Royal Park Canvas</small></div></div>
+<div class="tl-item"><div class="tl-time">20:00</div><div class="tl-text">🏮 中洲屋台体验！<br><small>福冈独有的路边摊文化，河边一排屋台超有氛围</small></div></div>
+</div>
+
+<h3 class="day-subtitle">📍 地标详解</h3>
+<div class="landmark-grid">
+<div class="landmark-card" style="border-left-color:var(--d4)">
+<h4>🐘 九州自然动物园 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">くじゅうしぜんどうぶつえん</small></h4>
+<div class="lc-row"><strong>门票</strong>约3,400日元/人</div>
+<div class="lc-row"><strong>丛林巴士</strong>另付约2,000日元/人</div>
+<div class="lc-row"><strong>建议</strong>全天（至少4~5h）</div>
+<div class="lc-history">📜 <strong>九州唯一的野生动物园：</strong>占地115万平方米，是九州最大规模的动物园。特色是让动物生活在接近野生的自然环境中——狮子在草原上漫步，长颈鹿在头顶走过，袋鼠在脚边跳跃。分为「Fureai Zone」（互动区，可与9种小动物近距离接触）和「Safari Zone」（猛兽区，乘铁笼车穿越）两大区域。丛林巴士是园内最受欢迎的体验，铁笼车带你穿越狮子、老虎、熊的领地，最近距离不到1米。</div>
+<div class="lc-tip">💡 丛林巴士非常热门！10/7(周三)是平日可约，每月15日开放次月预约。下午场：15:10 / 15:20 / 15:30。如未约到，上午开园时可尝试现场购买余票。</div>
+<div class="lc-alt">🔄 <strong>别府增加选项：</strong>如时间充裕，别府还有「地狱巡游」（七大地狱温泉，约2~3h）→ 铁轮温泉足浴 → 竹瓦温泉（复古罗马风澡堂）。但D4时间较紧，建议下次安排。</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d4)">
+<h4>🏮 中洲屋台 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">なかすやたい</small></h4>
+<div class="lc-row"><strong>亮点</strong>福冈独有的路边摊美食文化</div>
+<div class="lc-row"><strong>位置</strong>中洲河畔，酒店步行5min</div>
+<div class="lc-row"><strong>建议</strong>1~2h</div>
+<div class="lc-history">📜 <strong>70年的河畔美食：</strong>中洲屋台是福冈独有的文化——全日本只有福冈还保留着大规模的路边摊传统。历史可追溯到战后黑市时代（约1946年），摊贩们在河畔摆摊卖拉面、关东煮，逐渐成为福冈的标志性风景。如今中洲河畔约20家屋台沿河排列，18:00后陆续开摊，坐在小板凳上吃着博多拉面，看着那珂川的夜景，是来福冈必体验的一次。</div>
+<div class="lc-tip">💡 中洲屋台一般18:00后开始营业。推荐尝试：博多拉面（屋台版更地道）、烤的（yakitori）、关东煮。人均约1,000~2,000日元。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>川端商店街（博多最古老商店街，有拱廊）→ 博多运河城（水舞表演）→ 天神地下街（欧式风格地下商场）</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">🍜 美食推荐</h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🍗</div><h4>とり天（鸡肉天妇罗）</h4><p>大分名物！酥脆炸鸡天妇罗，蘸醋酱油吃。别府站前有多家人气店</p><span class="food-price">约1,000日元</span></div>
+<div class="food-card"><div class="food-emoji">🥩</div><h4>丰后和牛烧肉</h4><p>大分县品牌牛，肉质细腻，入口即化。推荐在别府站前烧肉店享用</p><span class="food-price">约3,000日元+</span></div>
+</div>
+
+<div class="tips-box">
+<h4>📝 Day 4 小贴士</h4>
+<ul>
+<li>丛林巴士非常热门！10/7(周三)是平日可约，每月15日开放次月预约</li>
+<li>下午场时间：15:10 / 15:20 / 15:30，提前到排队</li>
+<li>如未预约到丛林巴士，上午先尝试现场购票（有余票时）</li>
+<li>JR特急音速号建议提前在车站买指定席</li>
+<li>中洲屋台一般18:00后开始营业，可以河边散步等开摊</li>
+<li>别府的「地狱巡游」很值得去，但D4时间紧，可考虑D4早上或D5调整</li>
+</ul>
+</div>
+</div>
+
+<!-- ═══ D5 TAB ═══ -->
+<div class="tab-panel" id="panel-d5">
+<div class="day-header" style="background:linear-gradient(135deg,var(--d5),#5A3D7A)">
+<h2>🌊 D5 · 10月8日（周四）海之中道 + 面包超人</h2>
+<div class="day-meta"><span>🏨 Royal Park Canvas福冈中洲</span><span>🚃+🚌 约1h</span><span>强度 ★★☆</span></div>
+</div>
+
+<div class="map-container day-map"><div class="map" id="map-d5"></div></div>
+
+<h3 class="day-subtitle">🚩 交通攻略</h3>
+<div class="transport-steps">
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d5);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d5)">1</span>🚃 中洲川端 → 博多 → 海之中道</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚃</span>地铁空港线：中洲川端 → <strong>博多</strong>（1站，2min，210日元）</div>
+<div class="ts-item"><span class="ts-icon">🚃</span>JR鹿儿岛本线：博多 → <strong>西之崎</strong>（约20min，270日元）</div>
+<div class="ts-item"><span class="ts-icon">🚌</span>西铁巴士：西之崎站 → <strong>海之中道海滨公园</strong>（约15min，230日元）</div>
+<div class="ts-item"><span class="ts-icon">💰</span>全程合计约 <strong>710日元/人</strong></div>
+<div class="ts-item"><span class="ts-icon">⏰</span>全程约 <strong>40~50分钟</strong>（含换乘）</div>
+</div>
+<div class="ts-tip">💡 也可直接乘JR到「海之中道站」（香椎线），步行1分钟到公园西口。但需要从博多换乘香椎线，班次较少。推荐西之崎+巴士方案，班次更密。</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d5);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d5)">2</span>🚌 海之中道 → 市区（回程）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">🚌</span>西铁巴士 → 西之崎站 → JR → 博多</div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约40min</div>
+<div class="ts-item"><span class="ts-icon">💰</span>约500日元</div>
+</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">📋 时间轴</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-time">08:30</div><div class="tl-text">酒店出发</div></div>
+<div class="tl-item"><div class="tl-time">09:00 - 09:40</div><div class="tl-text">地铁+JR+巴士前往海之中道</div></div>
+<div class="tl-item"><div class="tl-time">09:40 - 12:30</div><div class="tl-text">🌊 海之中道海滨公园<br><small>10月波斯菊秋花、扫帚草变红、动物互动、大草坪</small></div></div>
+<div class="tl-item"><div class="tl-time">12:30 - 13:00</div><div class="tl-text">园内午餐</div></div>
+<div class="tl-item"><div class="tl-time">13:30</div><div class="tl-text">返回市区</div></div>
+<div class="tl-item"><div class="tl-time">14:00 - 16:30</div><div class="tl-text">🍞 面包超人博物馆<br><small>博多Riverain 5-6F，中洲川端站直通<br>每日限定表演秀！</small></div></div>
+<div class="tl-item"><div class="tl-time">17:00</div><div class="tl-text">回酒店休息</div></div>
+<div class="tl-item"><div class="tl-time">18:00 - 20:00</div><div class="tl-text">🍜 晚餐：博多拉面 / もつ鍋 / 中洲屋台<br><small>最后的福冈之夜，尽情享受！</small></div></div>
+</div>
+
+<h3 class="day-subtitle">📍 地标详解</h3>
+<div class="landmark-grid">
+<div class="landmark-card" style="border-left-color:var(--d5)">
+<h4>🌊 海之中道海滨公园 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">うみのなかみち</small></h4>
+<div class="lc-row"><strong>门票</strong>450日元/人</div>
+<div class="lc-row"><strong>自行车</strong>600日元/3h</div>
+<div class="lc-row"><strong>建议</strong>2~3h（公园很大，建议租车）</div>
+<div class="lc-history">📜 <strong>从军事基地到国民公园：</strong>海之中道是福冈市东区的一条沙洲，东西长约6km，将博多湾和玄界滩分隔开。这片土地在二战时是军事机场，战后被美军作为「博多基地」使用。1972年美军返还后，1981年改建为日本第5个国营公园，如今占地约540公顷。园内保留了白砂青松的自然海岸线，已成为福冈最具代表性的亲子休闲地。</div>
+<div class="lc-tip">💡 10月看点：约120万株波斯菊盛开（花之丘）、2,300株扫帚草变红、银杏大道金黄。公园很大（东西6km），一定要租自行车！</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>海洋世界海之中道水族馆（园内，单独门票约2,100日元）→ 动物之森（50种500只动物互动）→ 志贺岛金印公园（20min车程，日本国宝金印出土地）</div>
+</div>
+<div class="landmark-card" style="border-left-color:var(--d5)">
+<h4>🍞 面包超人博物馆 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">アンパンマン</small></h4>
+<div class="lc-row"><strong>位置</strong>博多Riverain 5-6F</div>
+<div class="lc-row"><strong>时间</strong>10:00-17:00（最终入馆16:00）</div>
+<div class="lc-row"><strong>门票</strong>2,000~2,200日元/人（1岁+）</div>
+<div class="lc-row"><strong>交通</strong>中洲川端站直通</div>
+<div class="lc-history">📜 <strong>国民绘本的世界：</strong>面包超人（アンパンマン）是柳濑嵩创作的日本国民级绘本角色，自1973年诞生以来深受日本儿童喜爱。面包超人的头是红豆面包，当有人饿肚子时，他会把自己的头分给别人吃——这是柳濑嵩在战争中目睹饥饿后创作的「用食物帮助他人」的故事。福冈馆设有互动剧场、面包超人工坊（DIY制作面包超人）和每日限定表演秀。</div>
+<div class="lc-tip">💡 入园后先看当日表演秀时间表，提前占位。低龄小朋友超爱！</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>博多运河城（水舞秀+购物）→ 川端商店街 → 天神地下街</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">🍜 美食推荐</h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🍜</div><h4>博多拉面（一风堂/一蘭）</h4><p>乳白色豚骨汤底+细面，福冈灵魂美食。一风堂、一蘭都发源于福冈</p><span class="food-price">约900日元</span></div>
+<div class="food-card"><div class="food-emoji">🍲</div><h4>もつ鍋（内脏火锅）</h4><p>福冈特色火锅，牛肠配韭菜酱油汤底，鲜美无比</p><span class="food-price">约3,000日元/锅</span></div>
+<div class="food-card"><div class="food-emoji">🏮</div><h4>中洲屋台</h4><p>福冈独有的路边摊文化，坐在小板凳上吃最地道</p><span class="food-price">约1,000~2,000日元</span></div>
+<div class="food-card"><div class="food-emoji">🐟</div><h4>明太子</h4><p>辣味鳕鱼子，福冈特产。推荐在博多站购买伴手礼</p><span class="food-price">各种价位</span></div>
+</div>
+
+<div class="tips-box">
+<h4>📝 Day 5 小贴士</h4>
+<ul>
+<li>海之中道公园很大，租自行车效率更高</li>
+<li>10月正值波斯菊花季，粉色花海非常美</li>
+<li>面包超人博物馆适合低龄小朋友，互动性强</li>
+<li>博物馆可网上提前购票，也可当日现场购买</li>
+<li>晚餐推荐もつ鍋（内脏火锅），福冈特色！推荐名店「博多華味鳥」</li>
+<li>如时间充裕，可增加海洋世界水族馆（海之中道公园内，约需1.5h）</li>
+</ul>
+</div>
+</div>
+
+<!-- ═══ D6 TAB ═══ -->
+<div class="tab-panel" id="panel-d6">
+<div class="day-header" style="background:linear-gradient(135deg,var(--d6),#5A5A5A)">
+<h2>🏙️ D6 · 10月9日（周五）KidZania → 返程</h2>
+<div class="day-meta"><span>🚃+✈️</span><span>强度 ★★☆</span></div>
+</div>
+
+<div class="map-container day-map"><div class="map" id="map-d6"></div></div>
+
+<h3 class="day-subtitle">🚩 交通攻略</h3>
+<div class="transport-steps">
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d6);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d6)">1</span>🚃 中洲川端 → 竹下（LaLaport福冈）</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>中洲川端站 → 地铁空港线 → 博多 → JR → <strong>竹下站</strong></div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约 <strong>15分钟</strong>（含换乘）</div>
+<div class="ts-item"><span class="ts-icon">💰</span>约 <strong>300日元</strong></div>
+<div class="ts-item"><span class="ts-icon">🚶</span>竹下站步行约9min到LaLaport福冈/KidZania</div>
+</div>
+</div>
+
+<div class="ts-step"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--d6);border-radius:4px 0 0 4px"></div>
+<div class="ts-title"><span class="ts-num" style="background:var(--d6)">2</span>🚃 竹下 → 福冈机场</div>
+<div class="ts-detail">
+<div class="ts-item"><span class="ts-icon">📍</span>竹下站 → JR → 博多 → 地铁空港线 → <strong>福冈机场站</strong></div>
+<div class="ts-item"><span class="ts-icon">⏰</span>约 <strong>25分钟</strong></div>
+<div class="ts-item"><span class="ts-icon">💰</span>约 <strong>400日元</strong></div>
+</div>
+<div class="ts-tip">💡 福冈机场离市区极近（地铁5分钟），是国内主要城市中离市中心最近的机场之一。建议预留1.5h办理值机和安检。</div>
+</div>
+</div>
+
+<h3 class="day-subtitle">📋 时间轴</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-time">08:00</div><div class="tl-text">退房，行李寄存前台</div></div>
+<div class="tl-item"><div class="tl-time">08:30</div><div class="tl-text">出发前往LaLaport福冈</div></div>
+<div class="tl-item"><div class="tl-time">08:50</div><div class="tl-text">到达LaLaport福冈 / KidZania</div></div>
+<div class="tl-item"><div class="tl-time">09:00 - 15:00</div><div class="tl-text">🏙️ KidZania福冈！<br><small>约70种职业体验：消防员、飞行员、寿司师傅…<br>九州限定：高汤专门店、汉方研究所</small></div></div>
+<div class="tl-item"><div class="tl-time">15:00</div><div class="tl-text">取行李，出发去机场</div></div>
+<div class="tl-item"><div class="tl-time">16:00</div><div class="tl-text">到达福冈机场，办理值机</div></div>
+<div class="tl-item"><div class="tl-time">航班起飞</div><div class="tl-text">✈️ 福冈 → 上海，再见九州！🌋</div></div>
+</div>
+
+<h3 class="day-subtitle">📍 地标详解</h3>
+<div class="landmark-grid">
+<div class="landmark-card" style="border-left-color:var(--d6)">
+<h4>🏙️ KidZania福冈 <small style="font-weight:400;color:var(--ink-muted);font-size:11px">キッザニア</small></h4>
+<div class="lc-row"><strong>位置</strong>LaLaport福冈内，JR竹下站步行9min</div>
+<div class="lc-row"><strong>时间</strong>9:00-15:00（6小时票）</div>
+<div class="lc-row"><strong>费用</strong>儿童4,800日元 / 大人2,500日元</div>
+<div class="lc-row"><strong>项目</strong>约70种职业体验</div>
+<div class="lc-history">📜 <strong>迷你城市体验：</strong>KidZania是全球知名的儿童职业体验连锁品牌，在世界各地有20+个场馆。福冈馆位于LaLaport福冈购物中心内，拥有约70种职业体验项目。孩子们穿上真实的工作服，在迷你城市中体验消防员、飞行员、寿司师傅、医生、记者等职业。完成工作后会获得「KidZ」货币，可以在馆内消费。九州限定项目包括「高汤专门店」（学做日式高汤）和「汉方研究所」（制作药膳）。全程日语环境，但工作人员会用手势和简单英语辅助。</div>
+<div class="lc-tip">💡 9:00开门，建议早到！热门职业（飞行员、消防员）需要先排队预约。穿方便活动的衣服和运动鞋。</div>
+<div class="lc-alt">🔄 <strong>周边可选：</strong>LaLaport福冈购物 → 博多运河城 → 福冈塔（九州最高塔，234m）→ 大濠公园散步</div>
+</div>
+</div>
+
+<div class="tips-box">
+<h4>📝 Day 6 小贴士</h4>
+<ul>
+<li>KidZania 9:00开门，建议早到，热门职业需要先排队预约</li>
+<li>全部日语环境，但工作人员会用手势和简单英语辅助</li>
+<li>大人可以让孩子独立体验，馆内有休息区和咖啡厅</li>
+<li>竹下站→福冈机场约25min，建议预留充足时间</li>
+<li>福冈机场国内线航站楼有免税店和特产区，可以最后采购</li>
+<li>行李可寄存在KidZania前台或LaLaport寄存柜</li>
+<li>如航班较晚，可在机场附近的「博多站」做最后购物（明太子是最佳伴手礼）</li>
+</ul>
+</div>
+</div>
+
+</section>
+
+<div class="hakata-divider"></div>
+
+<!-- 陆 · 预算框架 -->
+<section id="budget">
+<div class="section">
+<div class="section-title">
+<div class="jp-sub">ろく · よさん</div>
+<h2><span class="num">陆</span>预算框架</h2>
+<p>主要交通与门票费用参考（每人）</p>
+</div>
+<div class="overview-table-wrap">
+<table class="budget-table">
+<thead><tr><th>项目</th><th>参考价/人</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td>🚌 福冈机场→熊本巴士</td><td>2,500日元</td><td>ひのくに号</td></tr>
+<tr><td>🐬 天草海豚一日游</td><td>10,600日元</td><td>含往返+海豚+午餐（KKday）</td></tr>
+<tr><td>🌋 阿苏包车（均摊）</td><td>2,300元÷人数</td><td>7人座全天，含燃油+司机</td></tr>
+<tr><td>🐘 九州动物园</td><td>约5,400日元</td><td>门票3,400 + 丛林巴士2,000</td></tr>
+<tr><td>🚃 别府→博多 JR</td><td>4,690日元</td><td>特急音速号指定席</td></tr>
+<tr><td>🌊 海之中道</td><td>450日元</td><td>门票</td></tr>
+<tr><td>🍞 面包超人博物馆</td><td>2,200日元</td><td>1岁+</td></tr>
+<tr><td>🏙️ KidZania（儿童）</td><td>4,800日元</td><td>6小时票</td></tr>
+<tr><td>🚃 市内交通（地铁/JR等）</td><td>约2,000日元</td><td>零散市内交通估算</td></tr>
+<tr class="total"><td>合计约</td><td colspan="2">25,000 - 30,000日元/人（不含包车均摊和餐饮）</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<!-- 柒 · 美食总览 -->
+<section class="section-bg seigaiha-bg" id="food">
+<div class="section">
+<div class="section-title">
+<div class="jp-sub">しち · ぐるめ</div>
+<h2><span class="num">柒</span>美食总览</h2>
+<p>九州各区域必吃美食</p>
+</div>
+<div class="food-region">
+<h3>🐻 熊本 <small style="font-weight:400;color:var(--ink-muted);font-size:12px">くまもと</small></h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🍜</div><h4>熊本拉面（黒蒜油豚骨）</h4><p>浓郁豚骨汤底配上焦香黑蒜油，面条偏细直，熊本灵魂美食</p><span class="food-price">约900日元</span></div>
+<div class="food-card"><div class="food-emoji">🥩</div><h4>马肉刺身（马刺し）</h4><p>熊本名物！新鲜马肉切薄片，搭配姜泥酱油，口感鲜嫩</p><span class="food-price">约1,500日元</span></div>
+<div class="food-card"><div class="food-emoji">🌿</div><h4>辛子蓮根</h4><p>莲藕孔填入芥末味噌后裹面衣油炸，熊本经典小菜</p><span class="food-price">约500日元</span></div>
+</div>
+</div>
+<div class="food-region">
+<h3>🌋 阿苏 <small style="font-weight:400;color:var(--ink-muted);font-size:12px">あそ</small></h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🥩</div><h4>赤牛盖饭（あか牛丼）</h4><p>阿苏名物！红色牛肉铺满米饭，肉质鲜嫩多汁</p><span class="food-price">约1,200日元</span></div>
+<div class="food-card"><div class="food-emoji">🍲</div><h4>面疙瘩汤（だご汁）</h4><p>九州乡土料理，手捏面疙瘩配蔬菜味噌汤，暖身佳品</p><span class="food-price">约800日元</span></div>
+</div>
+</div>
+<div class="food-region">
+<h3>♨️ 别府 <small style="font-weight:400;color:var(--ink-muted);font-size:12px">べっぷ</small></h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🍗</div><h4>とり天（鸡肉天妇罗）</h4><p>大分名物！酥脆炸鸡天妇罗，蘸醋酱油吃</p><span class="food-price">约1,000日元</span></div>
+<div class="food-card"><div class="food-emoji">🥩</div><h4>丰后和牛烧肉</h4><p>大分县品牌牛，肉质细腻，入口即化</p><span class="food-price">约3,000日元+</span></div>
+</div>
+</div>
+<div class="food-region">
+<h3>🏮 福冈 <small style="font-weight:400;color:var(--ink-muted);font-size:12px">ふくおか</small></h3>
+<div class="food-grid">
+<div class="food-card"><div class="food-emoji">🍜</div><h4>博多拉面（一风堂/一蘭）</h4><p>乳白色豚骨汤底+细面，福冈灵魂。一风堂、一蘭都发源于此</p><span class="food-price">约900日元</span></div>
+<div class="food-card"><div class="food-emoji">🍲</div><h4>もつ鍋（内脏火锅）</h4><p>福冈特色火锅，牛肠配韭菜酱油汤底，鲜美无比</p><span class="food-price">约3,000日元/锅</span></div>
+<div class="food-card"><div class="food-emoji">🏮</div><h4>中洲屋台</h4><p>福冈独有的路边摊文化，中洲河畔一排屋台，氛围感满分</p><span class="food-price">约1,000-2,000日元</span></div>
+<div class="food-card"><div class="food-emoji">🐟</div><h4>明太子</h4><p>辣味鳕鱼子，福冈特产。可直接吃、配饭、作为伴手礼</p><span class="food-price">各种价位</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="hakata-divider"></div>
+
+<!-- 捌 · 出发准备清单 -->
+<section id="prepare">
+<div class="section">
+<div class="section-title">
+<div class="jp-sub">はち · じゅんび</div>
+<h2><span class="num">捌</span>出发准备清单</h2>
+<p>出行前逐项确认</p>
+</div>
+<div class="prep-grid">
+<div class="prep-card"><h4>📄 证件</h4><ul><li>护照（有效期6个月以上）</li><li>机票确认单（打印/电子）</li><li>酒店确认单（全部3家）</li><li>现金日元（建议5~8万）</li><li>信用卡（VISA/Mastercard）</li><li>旅行保险单</li></ul></div>
+<div class="prep-card"><h4>👕 衣物</h4><ul><li>10月九州约15~25°C</li><li>薄外套/卫衣必备</li><li>阿苏更冷约10~18°C，带厚外套</li><li>舒适步行鞋（日均步行1万步+）</li><li>换洗衣物（6天份）</li><li>轻便雨具</li></ul></div>
+<div class="prep-card"><h4>🎒 装备</h4><ul><li>充电宝（飞机上限2万mAh以内）</li><li>日本转换插头（A型双扁脚）</li><li>随身小包（装零钱、交通卡）</li><li>保温杯</li><li>相机/手机存储充足</li><li>塑料袋若干</li></ul></div>
+<div class="prep-card"><h4>💊 药品</h4><ul><li>肠胃药</li><li>晕车贴（天草海豚、阿苏山路）</li><li>创可贴</li><li>感冒药</li><li>防晒霜</li><li>驱蚊贴</li></ul></div>
+<div class="prep-card"><h4>📱 通讯</h4><ul><li>日本SIM卡 / eSIM</li><li>或随身WiFi租赁</li><li>下载Google Maps离线地图</li><li>下载换乘案内app</li><li>下载翻译app</li></ul></div>
+<div class="prep-card"><h4>👶 亲子</h4><ul><li>小零食（路上应急）</li><li>小玩具/绘本（巴士上用）</li><li>儿童保温杯</li><li>湿巾、纸巾</li><li>替换衣物（多备一套）</li><li>KidZania穿方便活动的衣服</li></ul></div>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+<p>🌋 九州六日 · 全家攻略 · 2026.10.4 — 10.9</p>
+<p class="footer-jp">火山 · 海豚 · 動物園 · アンパンマン · 職業体験 —— 毎日ハイライト</p>
+</footer>
+
+<script>
+// === SAFE STORAGE (localStorage may be blocked in iframes) ===
+var safeStorage={_data:{},getItem:function(k){try{return localStorage.getItem(k)}catch(e){return this._data[k]||null}},setItem:function(k,v){try{localStorage.setItem(k,v)}catch(e){this._data[k]=v}}};
+
+// === NAV ===
+(function(){
+var menuBtn=document.getElementById('menuBtn');
+var navLinks=document.getElementById('navLinks');
+var nav=document.getElementById('navbar');
+var scrollTopBtn=document.getElementById('scrollTop');
+if(menuBtn)menuBtn.addEventListener('click',function(){navLinks.classList.toggle('open')});
+if(navLinks)navLinks.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){navLinks.classList.remove('open')})});
+window.addEventListener('scroll',function(){
+if(nav)nav.classList.toggle('scrolled',window.scrollY>50);
+if(scrollTopBtn)scrollTopBtn.classList.toggle('show',window.scrollY>400);
+});
+if(scrollTopBtn)scrollTopBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+})();
+
+// === CHECKLIST ===
+(function(){
+document.querySelectorAll('.checklist-item').forEach(function(item){
+var key='kyushu_cl_'+item.dataset.key;
+try{if(safeStorage.getItem(key)==='1')item.classList.add('done')}catch(e){}
+item.addEventListener('click',function(){
+item.classList.toggle('done');
+try{safeStorage.setItem(key,item.classList.contains('done')?'1':'0')}catch(e){}
+});
+});
+})();
+
+// === TAB SWITCHING ===
+(function(){
+var tabBtns=document.querySelectorAll('.tab-btn');
+var tabPanels=document.querySelectorAll('.tab-panel');
+tabBtns.forEach(function(btn){
+btn.addEventListener('click',function(){
+tabBtns.forEach(function(b){b.classList.remove('active')});
+tabPanels.forEach(function(p){p.classList.remove('active')});
+btn.classList.add('active');
+var panel=document.getElementById('panel-'+btn.dataset.tab);
+if(panel)panel.classList.add('active');
+// invalidate maps after tab switch
+setTimeout(function(){
+try{
+document.querySelectorAll('.map').forEach(function(el){
+if(el._leaflet_map)el._leaflet_map.invalidateSize();
+});
+}catch(e){}
+},150);
+});
+});
+})();
+
+// === LEAFLET MAPS ===
+(function(){
+if(typeof L==='undefined'){console.warn('Leaflet not loaded');return}
+
+// CartoDB Voyager first (best global coverage, works in China), Gaode as backup
+var tileSources=[
+{url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',opts:{subdomains:'abcd',attribution:'&copy; CARTO',maxZoom:18}},
+{url:'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',opts:{subdomains:['1','2','3','4'],attribution:'&copy; 高德地图',maxZoom:18}}
+];
+
+function createTileLayer(){
+return L.tileLayer(tileSources[0].url,tileSources[0].opts);
+}
+
+function makeIcon(text,color){
+return L.divIcon({className:'custom-marker',
+html:'<div class="marker-pin" style="background:'+color+'">'+text+'</div>',
+iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]});
+}
+function addMarkers(m,pts){
+pts.forEach(function(p){var emoji=p.n.split(' ')[0];L.marker(p.p,{icon:makeIcon(emoji,p.c)}).addTo(m).bindPopup('<strong>'+p.n+'</strong>')});
+}
+
+// Overview map
+(function(){
+const m=L.map('map-overview',{scrollWheelZoom:false}).setView([32.9,130.9],8);
+createTileLayer().addTo(m);
+const pts=[
+{n:'✈️ 福冈机场',p:[33.585,130.447],c:'#C1440E'},
+{n:'🏨 熊本',p:[32.792,130.741],c:'#C1440E'},
+{n:'🐬 天草',p:[32.531,130.397],c:'#D4800E'},
+{n:'⛰️ 大观峰',p:[32.937,131.120],c:'#5B8C3E'},
+{n:'🌋 火山口',p:[32.883,131.106],c:'#5B8C3E'},
+{n:'🐴 草千里',p:[32.885,131.095],c:'#5B8C3E'},
+{n:'⛩️ 阿苏神社',p:[32.918,131.130],c:'#5B8C3E'},
+{n:'♨️ 别府',p:[33.280,131.496],c:'#2E5C8A'},
+{n:'🐘 动物园',p:[33.295,131.460],c:'#2E5C8A'},
+{n:'🌊 海之中道',p:[33.721,130.442],c:'#7B5EA7'},
+{n:'🏨 福冈中洲',p:[33.590,130.410],c:'#7B5EA7'},
+{n:'🏙️ KidZania',p:[33.567,130.447],c:'#7A7A7A'}
+];
+addMarkers(m,pts);
+L.polyline([[33.585,130.447],[32.792,130.741]],{color:'#C1440E',weight:3,opacity:0.8,dashArray:'8,6'}).addTo(m);
+L.polyline([[32.792,130.741],[32.531,130.397]],{color:'#D4800E',weight:3,opacity:0.8,dashArray:'8,6'}).addTo(m);
+L.polyline([[32.792,130.741],[32.937,131.120],[32.883,131.106],[32.885,131.095],[32.918,131.130],[33.280,131.496]],{color:'#5B8C3E',weight:3,opacity:0.8}).addTo(m);
+L.polyline([[33.280,131.496],[33.295,131.460],[33.280,131.496],[33.590,130.410]],{color:'#2E5C8A',weight:3,opacity:0.8,dashArray:'8,6'}).addTo(m);
+L.polyline([[33.590,130.410],[33.721,130.442],[33.590,130.410]],{color:'#7B5EA7',weight:3,opacity:0.8,dashArray:'8,6'}).addTo(m);
+L.polyline([[33.590,130.410],[33.585,130.447],[33.567,130.447]],{color:'#7A7A7A',weight:3,opacity:0.8,dashArray:'8,6'}).addTo(m);
+})();
+
+// Hotel maps
+(function(){
+var m1=L.map('hotel-map-1',{scrollWheelZoom:false}).setView([32.792,130.741],15);
+createTileLayer().addTo(m1);
+L.marker([32.792,130.741],{icon:makeIcon('🏨','#1B3A5C')}).addTo(m1).bindPopup('<strong>The Blossom 熊本</strong>');
+var m2=L.map('hotel-map-2',{scrollWheelZoom:false}).setView([33.280,131.496],15);
+createTileLayer().addTo(m2);
+L.marker([33.280,131.496],{icon:makeIcon('♨️','#2D2D2D')}).addTo(m2).bindPopup('<strong>AMANEK BEPPU YULA-RE</strong>');
+var m3=L.map('hotel-map-3',{scrollWheelZoom:false}).setView([33.590,130.410],15);
+createTileLayer().addTo(m3);
+L.marker([33.590,130.410],{icon:makeIcon('🏮','#5B3A6B')}).addTo(m3).bindPopup('<strong>THE Royal Park Canvas 福冈中洲</strong>');
+})();
+
+// D1 map
+(function(){
+const m=L.map('map-d1',{scrollWheelZoom:false}).setView([32.95,130.6],9);
+createTileLayer().addTo(m);
+const pts=[
+{n:'① 福冈机场',p:[33.585,130.447],c:'#C1440E'},
+{n:'② 熊本樱町BT',p:[32.795,130.735],c:'#C1440E'},
+{n:'③ The Blossom',p:[32.792,130.741],c:'#C1440E'},
+{n:'④ 熊本城',p:[32.802,130.707],c:'#C1440E'},
+{n:'⑤ 上通商店街',p:[32.794,130.710],c:'#C1440E'}
+];
+addMarkers(m,pts);
+L.polyline(pts.map(p=>p.p),{color:'#C1440E',weight:3}).addTo(m);
+})();
+
+// D2 map
+(function(){
+const m=L.map('map-d2',{scrollWheelZoom:false}).setView([32.66,130.57],10);
+createTileLayer().addTo(m);
+const pts=[
+{n:'① 熊本酒店',p:[32.792,130.741],c:'#D4800E'},
+{n:'② 樱町BT',p:[32.795,130.735],c:'#D4800E'},
+{n:'③ Risola Terrace',p:[32.531,130.397],c:'#D4800E'},
+{n:'④ 海豚海域',p:[32.50,130.35],c:'#D4800E'}
+];
+addMarkers(m,pts);
+L.polyline([pts[0].p,pts[1].p,pts[2].p,pts[3].p,pts[2].p,pts[1].p,pts[0].p],{color:'#D4800E',weight:3,dashArray:'8,6'}).addTo(m);
+})();
+
+// D3 map
+(function(){
+const m=L.map('map-d3',{scrollWheelZoom:false}).setView([32.90,131.11],11);
+createTileLayer().addTo(m);
+const pts=[
+{n:'① 熊本酒店',p:[32.792,130.741],c:'#5B8C3E'},
+{n:'② 大观峰',p:[32.937,131.120],c:'#5B8C3E'},
+{n:'③ 火山口',p:[32.883,131.106],c:'#5B8C3E'},
+{n:'④ 草千里',p:[32.885,131.095],c:'#5B8C3E'},
+{n:'⑤ 阿苏神社',p:[32.918,131.130],c:'#5B8C3E'},
+{n:'⑥ 锅瀑布',p:[32.905,131.115],c:'#5B8C3E'},
+{n:'⑦ 别府酒店',p:[33.280,131.496],c:'#5B8C3E'}
+];
+addMarkers(m,pts);
+L.polyline(pts.map(p=>p.p),{color:'#5B8C3E',weight:3}).addTo(m);
+})();
+
+// D4 map
+(function(){
+const m=L.map('map-d4',{scrollWheelZoom:false}).setView([33.3,131.2],9);
+createTileLayer().addTo(m);
+const pts=[
+{n:'① AMANEK',p:[33.280,131.496],c:'#2E5C8A'},
+{n:'② 别府站',p:[33.282,131.493],c:'#2E5C8A'},
+{n:'③ 动物园',p:[33.295,131.460],c:'#2E5C8A'},
+{n:'④ 博多站',p:[33.590,130.424],c:'#2E5C8A'},
+{n:'⑤ 中洲川端',p:[33.590,130.410],c:'#2E5C8A'}
+];
+addMarkers(m,pts);
+L.polyline([[33.280,131.496],[33.282,131.493],[33.295,131.460],[33.282,131.493],[33.280,131.496]],{color:'#2E5C8A',weight:3,dashArray:'6,4'}).addTo(m);
+L.polyline([[33.280,131.496],[33.590,130.424],[33.590,130.410]],{color:'#2E5C8A',weight:3}).addTo(m);
+})();
+
+// D5 map
+(function(){
+const m=L.map('map-d5',{scrollWheelZoom:false}).setView([33.65,130.43],11);
+createTileLayer().addTo(m);
+const pts=[
+{n:'① 中洲川端',p:[33.590,130.410],c:'#7B5EA7'},
+{n:'② 博多站',p:[33.590,130.424],c:'#7B5EA7'},
+{n:'③ 西之崎',p:[33.705,130.435],c:'#7B5EA7'},
+{n:'④ 海之中道',p:[33.721,130.442],c:'#7B5EA7'},
+{n:'⑤ 面包超人',p:[33.591,130.408],c:'#7B5EA7'}
+];
+addMarkers(m,pts);
+L.polyline([[33.590,130.410],[33.590,130.424],[33.705,130.435],[33.721,130.442],[33.705,130.435],[33.590,130.424],[33.590,130.410],[33.591,130.408]],{color:'#7B5EA7',weight:3,dashArray:'8,6'}).addTo(m);
+})();
+
+// D6 map
+(function(){
+const m=L.map('map-d6',{scrollWheelZoom:false}).setView([33.575,130.44],13);
+createTileLayer().addTo(m);
+const pts=[
+{n:'① 中洲川端',p:[33.590,130.410],c:'#7A7A7A'},
+{n:'② 竹下站',p:[33.567,130.447],c:'#7A7A7A'},
+{n:'③ KidZania',p:[33.565,130.449],c:'#7A7A7A'},
+{n:'④ 福冈机场',p:[33.585,130.447],c:'#7A7A7A'}
+];
+addMarkers(m,pts);
+L.polyline(pts.map(p=>p.p),{color:'#7A7A7A',weight:3}).addTo(m);
+})();
+
+// Fix maps on scroll / tab switch
+try{
+document.querySelectorAll('.map').forEach(function(el){
+var obs=new IntersectionObserver(function(entries){
+entries.forEach(function(e){if(e.isIntersecting){setTimeout(function(){try{if(el._leaflet_map)el._leaflet_map.invalidateSize()}catch(ex){}},200)}});
+},{threshold:0.1});
+obs.observe(el);
+});
+}catch(e){}
+})(); // end leaflet IIFE
+</script>
+
+<!-- SCROLL TOP BTN -->
+<button class="scroll-top" id="scrollTop" aria-label="回到顶部">↑</button>
+
+</body>
+</html>
